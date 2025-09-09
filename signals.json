@@ -1,0 +1,162 @@
+{
+  "SIG_20250908_110222": {
+    "signal_id": "SIG_20250908_110222",
+    "type": "entry",
+    "symbol": "EURUSD",
+    "action": "BUY",
+    "entry_price": 1.05,
+    "stop_loss": 1.045,
+    "take_profit": 1.06,
+    "description": "BUY signal - Bullish momentum detected",
+    "created_at": "2025-09-08T11:02:22.752227",
+    "status": "active",
+    "results": {
+      "hit_sl": false,
+      "hit_tp": false,
+      "manual_close": false,
+      "close_price": null,
+      "close_time": null,
+      "profit_loss": 0.0
+    }
+  },
+  "SIG_20250908_150745": {
+    "signal_id": "SIG_20250908_150745",
+    "type": "entry",
+    "symbol": "ETHUSDT",
+    "action": "SELL",
+    "entry_price": 2500.0,
+    "stop_loss": 2600.0,
+    "take_profit": 2300.0,
+    "description": "Short term setup",
+    "created_at": "2025-09-08T15:07:45.336381",
+    "status": "active",
+    "results": {
+      "hit_sl": false,
+      "hit_tp": false,
+      "manual_close": false,
+      "close_price": null,
+      "close_time": null,
+      "profit_loss": 0.0
+    }
+  },
+  "SIG_20250909_105557": {
+    "signal_id": "SIG_20250909_105557",
+    "type": "entry",
+    "symbol": "GOLD",
+    "action": "BUY",
+    "entry_price": 1940.0,
+    "stop_loss": 1999.0,
+    "take_profit": 2000.0,
+    "description": "tst",
+    "created_at": "2025-09-09T10:55:57.962613",
+    "status": "active",
+    "results": {
+      "hit_sl": false,
+      "hit_tp": false,
+      "manual_close": false,
+      "close_price": null,
+      "close_time": null,
+      "profit_loss": 0.0
+    }
+  },
+  "SIG_20250909_110254": {
+    "signal_id": "SIG_20250909_110254",
+    "type": "entry",
+    "symbol": "GOLD",
+    "action": "BUY",
+    "entry_price": 1940.0,
+    "stop_loss": 1999.0,
+    "take_profit": 2000.0,
+    "description": "tst",
+    "created_at": "2025-09-09T11:02:54.568984",
+    "status": "active",
+    "results": {
+      "hit_sl": false,
+      "hit_tp": false,
+      "manual_close": false,
+      "close_price": null,
+      "close_time": null,
+      "profit_loss": 0.0
+    }
+  },
+  "SIG_20250909_110314": {
+    "signal_id": "SIG_20250909_110314",
+    "type": "entry",
+    "symbol": "GOLD",
+    "action": "BUY",
+    "entry_price": 8888.0,
+    "stop_loss": 7777.0,
+    "take_profit": 6666.0,
+    "description": "test",
+    "created_at": "2025-09-09T11:03:14.251292",
+    "status": "active",
+    "results": {
+      "hit_sl": false,
+      "hit_tp": false,
+      "manual_close": false,
+      "close_price": null,
+      "close_time": null,
+      "profit_loss": 0.0
+    }
+  },
+  "SIG_20250909_114300": {
+    "signal_id": "SIG_20250909_114300",
+    "type": "entry",
+    "symbol": "GOLD",
+    "action": "BUY",
+    "entry_price": 1940.0,
+    "stop_loss": 1999.0,
+    "take_profit": 2000.0,
+    "description": "tst",
+    "created_at": "2025-09-09T11:43:00.958016",
+    "status": "active",
+    "results": {
+      "hit_sl": false,
+      "hit_tp": false,
+      "manual_close": false,
+      "close_price": null,
+      "close_time": null,
+      "profit_loss": 0.0
+    }
+  },
+  "SIG_20250909_114943": {
+    "signal_id": "SIG_20250909_114943",
+    "type": "entry",
+    "symbol": "GOLD",
+    "action": "BUY",
+    "entry_price": 1940.0,
+    "stop_loss": 1999.0,
+    "take_profit": 2000.0,
+    "description": "tst",
+    "created_at": "2025-09-09T11:49:43.544018",
+    "status": "active",
+    "results": {
+      "hit_sl": false,
+      "hit_tp": false,
+      "manual_close": false,
+      "close_price": null,
+      "close_time": null,
+      "profit_loss": 0.0
+    }
+  },
+  "SIG_20250909_170556": {
+    "signal_id": "SIG_20250909_170556",
+    "type": "entry",
+    "symbol": "GOLD",
+    "action": "BUY",
+    "entry_price": 1940.0,
+    "stop_loss": 1999.0,
+    "take_profit": 2000.0,
+    "description": "tst",
+    "created_at": "2025-09-09T17:05:56.001960",
+    "status": "active",
+    "results": {
+      "hit_sl": false,
+      "hit_tp": false,
+      "manual_close": false,
+      "close_price": null,
+      "close_time": null,
+      "profit_loss": 0.0
+    }
+  }
+}
