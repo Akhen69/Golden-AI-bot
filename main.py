@@ -2787,4 +2787,18 @@ def main():
         print("=" * 60)
 
 if __name__ == '__main__':
-    main()
+    # Railway compatibility
+    port = int(os.environ.get('PORT', 8000))
+    
+    # Start the bot
+    try:
+        main()
+    except KeyboardInterrupt:
+        print("\n" + "=" * 60)
+        print("🛑 BOT STOPPED BY USER")
+        print(f"📅 Stop Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print("=" * 60)
+    except Exception as e:
+        print(f"\n❌ BOT ERROR: {e}")
+        print(f"📅 Error Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
+        print("=" * 60)
