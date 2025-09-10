@@ -211,6 +211,8 @@ def calculate_technical_indicators(data):
 def generate_market_analysis():
     """Generate AI-powered market analysis - GOLD FOCUSED"""
     try:
+        logger.info("Starting market analysis generation")
+        
         # Fetch data for GOLD only
         gold_data = get_market_data("GC=F")  # Gold futures
         
@@ -221,6 +223,7 @@ def generate_market_analysis():
         
         # Analyze GOLD with enhanced indicators
         if gold_data is not None and not gold_data.empty:
+            logger.info("Real market data found, generating analysis")
             gold_indicators = calculate_technical_indicators(gold_data)
             if gold_indicators:
                 current_price = gold_indicators['current_price']
@@ -295,11 +298,13 @@ def generate_market_analysis():
     except Exception as e:
         logger.error(f"Error generating market analysis: {e}")
         # Return fallback analysis if data fetching fails
+        logger.info("Using fallback analysis due to error")
         return generate_fallback_analysis()
 
 def generate_fallback_analysis():
     """Generate fallback analysis when data fetching fails"""
     try:
+        logger.info("Generating fallback market analysis")
         # Use static data as fallback
         current_price = 1935.50  # Approximate current gold price
         analysis = {
@@ -323,7 +328,7 @@ def generate_fallback_analysis():
                 }
             }
         }
-        logger.info("Generated fallback market analysis")
+        logger.info(f"Generated fallback market analysis with {len(analysis['instruments'])} instruments")
         return analysis
     except Exception as e:
         logger.error(f"Error generating fallback analysis: {e}")
@@ -331,7 +336,9 @@ def generate_fallback_analysis():
 
 def format_market_analysis(analysis):
     """Format market analysis for display - GOLD FOCUSED"""
-    if not analysis or not analysis.get('instruments'):
+    logger.info(f"Formatting market analysis: {analysis is not None}")
+    if not analysis or not analysis.get('instruments') or not analysis['instruments']:
+        logger.warning("No analysis data available, showing error message")
         return "📊 **Today's Free Market Analysis (Educational Only)**\n\n❌ Unable to fetch market data at the moment.\n\n⚠️ **Disclaimer:** AI-generated analysis. Educational use only. DYOR & TAYOR."
     
     message = "📊 **Today's Free Market Analysis (Educational Only)**\n\n"
