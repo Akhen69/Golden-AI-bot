@@ -175,25 +175,38 @@ class AdminPanel:
         else:
             return results
         
+        # Debug: Log target users count
+        logger.info(f"Broadcast target '{target}': {len(target_users)} users found")
+        
+        if not target_users:
+            logger.warning(f"No users found for target '{target}'")
+            return results
+        
         for user_id in target_users.keys():
             try:
+                # Add small delay to avoid rate limiting
+                await asyncio.sleep(0.1)
+                
                 await context.bot.send_message(
                     chat_id=user_id,
                     text=f"📢 **Broadcast Message**\n\n{message}",
                     parse_mode=ParseMode.MARKDOWN
                 )
                 results["sent"] += 1
+                logger.info(f"Broadcast sent successfully to user {user_id}")
                 
                 # Update signal count for premium users
                 if target in ["all", "premium", "trial"]:
                     user_data = self.db.get_user(user_id)
-                    current_count = user_data.get('total_signals_received', 0)
-                    self.db.update_user(user_id, total_signals_received=current_count + 1)
+                    if user_data:
+                        current_count = user_data.get('total_signals_received', 0)
+                        self.db.update_user(user_id, total_signals_received=current_count + 1)
                 
             except Exception as e:
                 logger.error(f"Failed to send broadcast to {user_id}: {e}")
                 results["failed"] += 1
         
+        logger.info(f"Broadcast completed: {results['sent']} sent, {results['failed']} failed")
         return results
     
     def get_analytics_report(self) -> str:
