@@ -64,7 +64,7 @@ def get_user_status(user_id: int) -> str:
     today = date.today()
     
     if user['status'] == 'trial':
-        if user['trial_end'] and datetime.fromisoformat(user['trial_end']).date() < today:
+        if user['trial_end'] and datetime.fromisoformat(user['trial_end']).date() <= today:
             db.update_user(user_id, status='free')
             return 'free'
         return 'trial'
