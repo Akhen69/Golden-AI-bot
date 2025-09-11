@@ -1136,7 +1136,7 @@ async def admin_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
             "• Educational format with disclaimers\n\n"
             "📸 Media Broadcasting:\n"
             "• Send photo/video/document - Goes to ALL users\n"
-            "• Signals only go to PREMIUM users\n\n"
+            "• AI Signals go to PREMIUM + TRIAL users\n\n"
             "📊 Analytics & Reports:\n"
             "• /auto_suspend - Auto suspend inactive users\n"
             "• /smart_notify - Send smart notifications\n"

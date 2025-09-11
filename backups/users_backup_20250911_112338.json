@@ -453,10 +453,30 @@
     "suspended": false,
     "suspension_reason": null,
     "created_at": "2025-09-08T21:23:20.582542",
-    "last_activity": "2025-09-09T19:08:20.465643",
+    "last_activity": "2025-09-09T19:10:46.614800",
     "last_verification": "2025-09-08T21:49:33.279547",
     "verification_requests": 0,
-    "total_signals_received": 8,
+    "total_signals_received": 9,
     "premium_since": "2025-09-08T21:49:33.279547"
+  },
+  "2042731566": {
+    "user_id": 2042731566,
+    "status": "trial",
+    "country": null,
+    "terms_accepted": true,
+    "trial_end": "2025-09-23T22:26:29.688954",
+    "subscription_end": null,
+    "full_name": null,
+    "email": null,
+    "account_number": null,
+    "verified": false,
+    "suspended": false,
+    "suspension_reason": null,
+    "created_at": "2025-09-09T22:26:16.872007",
+    "last_activity": "2025-09-09T22:26:29.688954",
+    "last_verification": null,
+    "verification_requests": 0,
+    "total_signals_received": 0,
+    "premium_since": null
   }
 }

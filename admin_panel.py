@@ -158,9 +158,25 @@ class AdminPanel:
         
         return True, f"User {user_id} reactivated."
     
+    def _process_broadcast_message(self, message: str) -> str:
+        """Process broadcast message to handle special characters and mentions"""
+        import re
+        
+        # Don't escape @mentions - let them display normally
+        processed = message
+        
+        # Only escape characters that cause parsing errors, not @mentions
+        # Escape underscores, asterisks, and other markdown that might break parsing
+        processed = re.sub(r'(?<!\\)([_*\[\]()~`>#+=|{}.!-])', r'\\\1', processed)
+        
+        return processed
+    
     async def send_broadcast(self, context: ContextTypes.DEFAULT_TYPE, message: str, target: str = "all") -> Dict[str, int]:
         """Send broadcast message to users"""
         results = {"sent": 0, "failed": 0}
+        
+        # Process message to handle special characters and mentions
+        processed_message = self._process_broadcast_message(message)
         
         if target == "all":
             target_users = self.db.get_all_users()
@@ -189,8 +205,9 @@ class AdminPanel:
                 
                 await context.bot.send_message(
                     chat_id=user_id,
-                    text=f"📢 **Broadcast Message**\n\n{message}",
-                    parse_mode=ParseMode.MARKDOWN
+                    text=f"📢 **Broadcast Message**\n\n{processed_message}",
+                    parse_mode=ParseMode.MARKDOWN,
+                    disable_web_page_preview=True
                 )
                 results["sent"] += 1
                 logger.info(f"Broadcast sent successfully to user {user_id}")

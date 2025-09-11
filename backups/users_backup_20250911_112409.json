@@ -13,10 +13,10 @@
     "suspended": false,
     "suspension_reason": null,
     "created_at": "2025-09-07T19:53:47.410941",
-    "last_activity": "2025-09-09T19:10:01.084253",
+    "last_activity": "2025-09-11T11:24:04.896104",
     "last_verification": null,
     "verification_requests": 0,
-    "total_signals_received": 6,
+    "total_signals_received": 8,
     "premium_since": null
   },
   "736795642": {
@@ -133,10 +133,10 @@
     "suspended": false,
     "suspension_reason": null,
     "created_at": "2025-09-08T11:46:33.471643",
-    "last_activity": "2025-09-09T19:10:14.177905",
+    "last_activity": "2025-09-11T11:24:09.267502",
     "last_verification": "2025-09-08T15:14:02.851232",
     "verification_requests": 0,
-    "total_signals_received": 9,
+    "total_signals_received": 11,
     "premium_since": "2025-09-08T12:07:58.972123"
   },
   "5990066361": {
@@ -153,10 +153,10 @@
     "suspended": false,
     "suspension_reason": null,
     "created_at": "2025-09-08T12:12:52.671140",
-    "last_activity": "2025-09-09T19:10:14.805588",
+    "last_activity": "2025-09-11T11:23:45.021777",
     "last_verification": "2025-09-08T12:16:54.058336",
     "verification_requests": 0,
-    "total_signals_received": 9,
+    "total_signals_received": 10,
     "premium_since": "2025-09-08T12:16:54.058336"
   },
   "6460558113": {
@@ -413,10 +413,10 @@
     "suspended": false,
     "suspension_reason": null,
     "created_at": "2025-09-08T18:39:58.322790",
-    "last_activity": "2025-09-09T19:08:12.887742",
+    "last_activity": "2025-09-09T19:10:38.886452",
     "last_verification": null,
     "verification_requests": 0,
-    "total_signals_received": 6,
+    "total_signals_received": 7,
     "premium_since": null
   },
   "635732141": {
@@ -453,10 +453,30 @@
     "suspended": false,
     "suspension_reason": null,
     "created_at": "2025-09-08T21:23:20.582542",
-    "last_activity": "2025-09-09T19:08:20.465643",
+    "last_activity": "2025-09-09T19:10:46.614800",
     "last_verification": "2025-09-08T21:49:33.279547",
     "verification_requests": 0,
-    "total_signals_received": 8,
+    "total_signals_received": 9,
     "premium_since": "2025-09-08T21:49:33.279547"
+  },
+  "2042731566": {
+    "user_id": 2042731566,
+    "status": "trial",
+    "country": null,
+    "terms_accepted": true,
+    "trial_end": "2025-09-23T22:26:29.688954",
+    "subscription_end": null,
+    "full_name": null,
+    "email": null,
+    "account_number": null,
+    "verified": false,
+    "suspended": false,
+    "suspension_reason": null,
+    "created_at": "2025-09-09T22:26:16.872007",
+    "last_activity": "2025-09-09T22:26:29.688954",
+    "last_verification": null,
+    "verification_requests": 0,
+    "total_signals_received": 0,
+    "premium_since": null
   }
 }
