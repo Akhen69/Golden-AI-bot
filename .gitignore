@@ -1,8 +1,4 @@
-# Data files - NEVER commit to git
-users.json
-signals.json
-latest_signal.json
-daily_analysis.json
+
 
 # Backup directory
 backups/
