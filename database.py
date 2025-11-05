@@ -167,10 +167,21 @@ class UserDatabase:
     
     def approve_user(self, user_id: int):
         """Approve user for premium access"""
-        self.update_user(user_id, 
-                        verified=True, 
-                        status='premium',
-                        last_verification=datetime.now().isoformat())
+        user = self.get_user(user_id)
+        
+        # Check if user is on trial
+        if user.get('status') == 'trial' and user.get('trial_end'):
+            # User is on trial - keep trial status until it expires
+            # Just mark as verified, don't change status yet
+            self.update_user(user_id, 
+                            verified=True,
+                            last_verification=datetime.now().isoformat())
+        else:
+            # User is not on trial - approve normally
+            self.update_user(user_id, 
+                            verified=True, 
+                            status='premium',
+                            last_verification=datetime.now().isoformat())
     
     def reject_user(self, user_id: int):
         """Reject user verification request"""

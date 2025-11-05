@@ -1,0 +1,45 @@
+# Data files - NEVER commit to git
+users.json
+signals.json
+latest_signal.json
+daily_analysis.json
+
+# Backup directory
+backups/
+
+# Video files
+video/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+ENV/
+.venv
+
+# Environment variables
+.env
+.env.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.bak
+
+

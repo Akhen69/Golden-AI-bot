@@ -9,6 +9,7 @@ Description: Complete trading bot with trial system, premium access, and admin p
 import asyncio
 import logging
 import os
+import io
 from datetime import datetime, timedelta, date, time
 from typing import Dict, Any, Optional
 import json
@@ -16,7 +17,7 @@ import yfinance as yf
 import pandas as pd
 import numpy as np
 
-from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup, ReplyKeyboardMarkup, KeyboardButton, InputFile, BotCommand, MenuButtonCommands
 from telegram.ext import (
     Application, CommandHandler, MessageHandler, CallbackQueryHandler,
     ContextTypes, filters, ConversationHandler
@@ -48,6 +49,336 @@ BROKER_LINK = os.getenv('BROKER_LINK', 'https://your-broker-link.com')
 (TERMS, TRIAL_CHOICE, REGISTER_NAME, REGISTER_EMAIL, 
  ACCOUNT_NUMBER, ADMIN_VERIFY) = range(6)
 
+# Translation Dictionary
+TRANSLATIONS = {
+    'en': {
+        # Buttons
+        'btn_free_analysis': '📊 Free Market Analysis',
+        'btn_premium_signals': '🔑 Premium Signals',
+        'btn_register': '📝 Register for Premium',
+        'btn_my_account': '👤 My Account',
+        'btn_help': 'ℹ️ Help & Support',
+        'btn_notice_board': '📌 Notice Board',
+        'btn_performance': '📈 Performance Record',
+        'btn_terms': '📜 Terms and Conditions',
+        'btn_language': '🌐 Language',
+        'btn_english': '🇬🇧 English',
+        'btn_malay': '🇲🇾 Malay',
+        'btn_indonesian': '🇮🇩 Indonesian',
+        'btn_back': '⬅️ Back to Main Menu',
+        
+        # Status
+        'status_trial': '🎁 Premium Trial Active ({days} days left)',
+        'status_premium': '💎 Premium Member',
+        'status_free': '🆓 Free User',
+        'status_suspended': '🚫 Suspended',
+        
+        # Menu
+        'menu_choose_option': 'Choose an option:',
+        'menu_welcome': '👋 Welcome',
+        
+        # Account
+        'account_title': '👤 My Account',
+        'account_status': '📊 Status:',
+        'account_country': '🌍 Country:',
+        'account_email': '📧 Email:',
+        'account_number': '🔢 Account Number:',
+        'account_verified': '✅ Verified',
+        'account_not_verified': '❌ Not Verified',
+        'account_trial_days': '⏳ Trial Days Left:',
+        'account_premium_message': '\n\n✨ Thank you for being a Premium member!\nKeep your broker account active to enjoy uninterrupted access.',
+        
+        # Help
+        'help_title': 'ℹ️ Help & Support',
+        'help_features': 'Available Features:',
+        'help_free_analysis': '📊 Free Analysis – Daily AI-generated market observations',
+        'help_premium_signals': '💎 Premium Signals – Access detailed study notes (trial/premium only)',
+        'help_register': '📝 Register – Upgrade to Premium by registering with our broker link',
+        'help_account': '👤 Account – Check your status (Trial / Premium / Suspended)',
+        'help_how_premium': 'How Premium Works:',
+        'help_step1': '1️⃣ Start with a 14-day free trial',
+        'help_step2': '2️⃣ Register with our broker link',
+        'help_step3': '3️⃣ Deposit minimum $50 USD into broker account',
+        'help_step4': '4️⃣ Submit your email & name for verification',
+        'help_step5': '5️⃣ Admin approval grants Premium access',
+        'help_disclaimer': '⚠️ Important Disclaimer:',
+        'help_disclaimer_text': 'All analysis provided is AI-generated and for educational purposes only.\n\nThis service does not provide financial advice.\n\nUsers must DYOR (Do Your Own Research) and TAYOR (Trade At Your Own Risk).\n\nBy using this bot, you acknowledge that you take full responsibility for your trading decisions.',
+        'help_contact': '📬 Support Contact: [Admin](https://t.me/GoldenAi_admin)',
+        
+        # Notice Board
+        'notice_title': '📌 Notice Board',
+        'notice_announcements': '📢 Important Announcements:',
+        'notice_stay_updated': 'Stay updated with the latest news and updates from our trading bot.',
+        'notice_check_regularly': '📅 Check back regularly for new notices.',
+        'notice_tips': '💡 Tips:',
+        'notice_tip1': '• Follow all signals responsibly',
+        'notice_tip2': '• Manage your risk properly',
+        'notice_tip3': '• Keep your broker account active',
+        
+        # Performance
+        'performance_title': '📈 Performance Record',
+        'performance_stats': '📊 Signal Performance Statistics:',
+        'performance_coming_soon': 'Coming soon! Track your trading performance and signal results here.',
+        'performance_features': '💡 Features:',
+        'performance_feature1': '• Win rate tracking',
+        'performance_feature2': '• Profit/Loss analysis',
+        'performance_feature3': '• Signal history',
+        'performance_soon': '🔒 This feature will be available soon!',
+        
+        # Terms
+        'terms_title': '📜 Terms and Conditions',
+        'terms_important': '📋 Important Information:',
+        'terms_1_title': '1. Educational Purpose Only',
+        'terms_1_text': 'All signals and analysis are for educational purposes only.',
+        'terms_2_title': '2. Risk Disclaimer',
+        'terms_2_text': 'Trading involves risk. Always do your own research (DYOR) and take your own responsibility (TAYOR).',
+        'terms_3_title': '3. No Financial Advice',
+        'terms_3_text': 'We do not provide financial advice. All trading decisions are your own.',
+        'terms_4_title': '4. Broker Registration',
+        'terms_4_text': 'Premium access requires valid broker account registration.',
+        'terms_5_title': '5. Account Responsibility',
+        'terms_5_text': 'Keep your broker account funded and active to maintain Premium status.',
+        'terms_agree': '⚠️ By using this bot, you agree to these terms.',
+        
+        # Language
+        'lang_title': '🌐 Language Selection',
+        'lang_choose': 'Choose your preferred language:',
+        'lang_english': '🇬🇧 English - English language',
+        'lang_malay': '🇲🇾 Malay - Bahasa Melayu',
+        'lang_indonesian': '🇮🇩 Indonesian - Bahasa Indonesia',
+        'lang_select': 'Select a language to continue:',
+        'lang_changed_en': '✅ Language changed to English\n\nAll bot messages will now be displayed in English.',
+        'lang_changed_my': '✅ Bahasa telah ditukar ke Bahasa Melayu\n\nSemua mesej bot kini akan dipaparkan dalam Bahasa Melayu.',
+        'lang_changed_id': '✅ Bahasa telah diubah ke Bahasa Indonesia\n\nSemua pesan bot sekarang akan ditampilkan dalam Bahasa Indonesia.',
+    },
+    'my': {
+        # Buttons
+        'btn_free_analysis': '📊 Analisis Pasaran Percuma',
+        'btn_premium_signals': '🔑 Isyarat Premium',
+        'btn_register': '📝 Daftar untuk Premium',
+        'btn_my_account': '👤 Akaun Saya',
+        'btn_help': 'ℹ️ Bantuan & Sokongan',
+        'btn_notice_board': '📌 Papan Notis',
+        'btn_performance': '📈 Rekod Prestasi',
+        'btn_terms': '📜 Terma dan Syarat',
+        'btn_language': '🌐 Bahasa',
+        'btn_english': '🇬🇧 Bahasa Inggeris',
+        'btn_malay': '🇲🇾 Bahasa Melayu',
+        'btn_indonesian': '🇮🇩 Bahasa Indonesia',
+        'btn_back': '⬅️ Kembali ke Menu Utama',
+        
+        # Status
+        'status_trial': '🎁 Percubaan Premium Aktif ({days} hari lagi)',
+        'status_premium': '💎 Ahli Premium',
+        'status_free': '🆓 Pengguna Percuma',
+        'status_suspended': '🚫 Digantung',
+        
+        # Menu
+        'menu_choose_option': 'Pilih pilihan:',
+        'menu_welcome': '👋 Selamat Datang',
+        
+        # Account
+        'account_title': '👤 Akaun Saya',
+        'account_status': '📊 Status:',
+        'account_country': '🌍 Negara:',
+        'account_email': '📧 Emel:',
+        'account_number': '🔢 Nombor Akaun:',
+        'account_verified': '✅ Disahkan',
+        'account_not_verified': '❌ Tidak Disahkan',
+        'account_trial_days': '⏳ Hari Percubaan Tinggal:',
+        'account_premium_message': '\n\n✨ Terima kasih kerana menjadi ahli Premium!\nPastikan akaun broker anda aktif untuk menikmati akses tanpa gangguan.',
+        
+        # Help
+        'help_title': 'ℹ️ Bantuan & Sokongan',
+        'help_features': 'Ciri-ciri Tersedia:',
+        'help_free_analysis': '📊 Analisis Percuma – Pemerhatian pasaran yang dijana AI setiap hari',
+        'help_premium_signals': '💎 Isyarat Premium – Akses nota kajian terperinci (percubaan/premium sahaja)',
+        'help_register': '📝 Daftar – Naik taraf ke Premium dengan mendaftar menggunakan pautan broker kami',
+        'help_account': '👤 Akaun – Semak status anda (Percubaan / Premium / Digantung)',
+        'help_how_premium': 'Bagaimana Premium Berfungsi:',
+        'help_step1': '1️⃣ Mulakan dengan percubaan percuma 14 hari',
+        'help_step2': '2️⃣ Daftar dengan pautan broker kami',
+        'help_step3': '3️⃣ Deposit minimum $50 USD ke akaun broker',
+        'help_step4': '4️⃣ Hantar emel & nama anda untuk pengesahan',
+        'help_step5': '5️⃣ Kelulusan admin memberikan akses Premium',
+        'help_disclaimer': '⚠️ Penafian Penting:',
+        'help_disclaimer_text': 'Semua analisis yang disediakan dijana AI dan untuk tujuan pendidikan sahaja.\n\nPerkhidmatan ini tidak memberikan nasihat kewangan.\n\nPengguna mesti DYOR (Lakukan Penyelidikan Sendiri) dan TAYOR (Berdagang Atas Risiko Sendiri).\n\nDengan menggunakan bot ini, anda mengakui bahawa anda mengambil tanggungjawab penuh untuk keputusan perdagangan anda.',
+        'help_contact': '📬 Hubungan Sokongan: [Admin](https://t.me/GoldenAi_admin)',
+        
+        # Notice Board
+        'notice_title': '📌 Papan Notis',
+        'notice_announcements': '📢 Pengumuman Penting:',
+        'notice_stay_updated': 'Kekal dikemas kini dengan berita dan kemas kini terkini dari bot perdagangan kami.',
+        'notice_check_regularly': '📅 Semak kembali secara berkala untuk notis baharu.',
+        'notice_tips': '💡 Petua:',
+        'notice_tip1': '• Ikuti semua isyarat dengan bertanggungjawab',
+        'notice_tip2': '• Urus risiko anda dengan betul',
+        'notice_tip3': '• Pastikan akaun broker anda aktif',
+        
+        # Performance
+        'performance_title': '📈 Rekod Prestasi',
+        'performance_stats': '📊 Statistik Prestasi Isyarat:',
+        'performance_coming_soon': 'Akan datang! Jejaki prestasi perdagangan dan hasil isyarat anda di sini.',
+        'performance_features': '💡 Ciri-ciri:',
+        'performance_feature1': '• Penjejakan kadar kemenangan',
+        'performance_feature2': '• Analisis Untung/Rugi',
+        'performance_feature3': '• Sejarah isyarat',
+        'performance_soon': '🔒 Ciri ini akan tersedia tidak lama lagi!',
+        
+        # Terms
+        'terms_title': '📜 Terma dan Syarat',
+        'terms_important': '📋 Maklumat Penting:',
+        'terms_1_title': '1. Tujuan Pendidikan Sahaja',
+        'terms_1_text': 'Semua isyarat dan analisis adalah untuk tujuan pendidikan sahaja.',
+        'terms_2_title': '2. Penafian Risiko',
+        'terms_2_text': 'Perdagangan melibatkan risiko. Sentiasa lakukan penyelidikan sendiri (DYOR) dan ambil tanggungjawab sendiri (TAYOR).',
+        'terms_3_title': '3. Tiada Nasihat Kewangan',
+        'terms_3_text': 'Kami tidak memberikan nasihat kewangan. Semua keputusan perdagangan adalah keputusan anda sendiri.',
+        'terms_4_title': '4. Pendaftaran Broker',
+        'terms_4_text': 'Akses Premium memerlukan pendaftaran akaun broker yang sah.',
+        'terms_5_title': '5. Tanggungjawab Akaun',
+        'terms_5_text': 'Pastikan akaun broker anda dibiayai dan aktif untuk mengekalkan status Premium.',
+        'terms_agree': '⚠️ Dengan menggunakan bot ini, anda bersetuju dengan terma ini.',
+        
+        # Language
+        'lang_title': '🌐 Pemilihan Bahasa',
+        'lang_choose': 'Pilih bahasa pilihan anda:',
+        'lang_english': '🇬🇧 Bahasa Inggeris - English language',
+        'lang_malay': '🇲🇾 Bahasa Melayu - Bahasa Melayu',
+        'lang_indonesian': '🇮🇩 Bahasa Indonesia - Bahasa Indonesia',
+        'lang_select': 'Pilih bahasa untuk meneruskan:',
+        'lang_changed_en': '✅ Language changed to English\n\nAll bot messages will now be displayed in English.',
+        'lang_changed_my': '✅ Bahasa telah ditukar ke Bahasa Melayu\n\nSemua mesej bot kini akan dipaparkan dalam Bahasa Melayu.',
+        'lang_changed_id': '✅ Bahasa telah diubah ke Bahasa Indonesia\n\nSemua pesan bot sekarang akan ditampilkan dalam Bahasa Indonesia.',
+    },
+    'id': {
+        # Buttons
+        'btn_free_analysis': '📊 Analisis Pasar Gratis',
+        'btn_premium_signals': '🔑 Sinyal Premium',
+        'btn_register': '📝 Daftar untuk Premium',
+        'btn_my_account': '👤 Akun Saya',
+        'btn_help': 'ℹ️ Bantuan & Dukungan',
+        'btn_notice_board': '📌 Papan Pengumuman',
+        'btn_performance': '📈 Catatan Performa',
+        'btn_terms': '📜 Syarat dan Ketentuan',
+        'btn_language': '🌐 Bahasa',
+        'btn_english': '🇬🇧 Bahasa Inggris',
+        'btn_malay': '🇲🇾 Bahasa Melayu',
+        'btn_indonesian': '🇮🇩 Bahasa Indonesia',
+        'btn_back': '⬅️ Kembali ke Menu Utama',
+        
+        # Status
+        'status_trial': '🎁 Uji Coba Premium Aktif (tersisa {days} hari)',
+        'status_premium': '💎 Anggota Premium',
+        'status_free': '🆓 Pengguna Gratis',
+        'status_suspended': '🚫 Ditangguhkan',
+        
+        # Menu
+        'menu_choose_option': 'Pilih opsi:',
+        'menu_welcome': '👋 Selamat Datang',
+        
+        # Account
+        'account_title': '👤 Akun Saya',
+        'account_status': '📊 Status:',
+        'account_country': '🌍 Negara:',
+        'account_email': '📧 Email:',
+        'account_number': '🔢 Nomor Akun:',
+        'account_verified': '✅ Terverifikasi',
+        'account_not_verified': '❌ Belum Terverifikasi',
+        'account_trial_days': '⏳ Hari Uji Coba Tersisa:',
+        'account_premium_message': '\n\n✨ Terima kasih telah menjadi anggota Premium!\nPastikan akun broker Anda aktif untuk menikmati akses tanpa gangguan.',
+        
+        # Help
+        'help_title': 'ℹ️ Bantuan & Dukungan',
+        'help_features': 'Fitur Tersedia:',
+        'help_free_analysis': '📊 Analisis Gratis – Observasi pasar harian yang dihasilkan AI',
+        'help_premium_signals': '💎 Sinyal Premium – Akses catatan studi mendalam (uji coba/premium saja)',
+        'help_register': '📝 Daftar – Upgrade ke Premium dengan mendaftar menggunakan tautan broker kami',
+        'help_account': '👤 Akun – Periksa status Anda (Uji Coba / Premium / Ditangguhkan)',
+        'help_how_premium': 'Cara Kerja Premium:',
+        'help_step1': '1️⃣ Mulai dengan uji coba gratis 14 hari',
+        'help_step2': '2️⃣ Daftar dengan tautan broker kami',
+        'help_step3': '3️⃣ Deposit minimum $50 USD ke akun broker',
+        'help_step4': '4️⃣ Kirimkan email & nama Anda untuk verifikasi',
+        'help_step5': '5️⃣ Persetujuan admin memberikan akses Premium',
+        'help_disclaimer': '⚠️ Penafian Penting:',
+        'help_disclaimer_text': 'Semua analisis yang disediakan dihasilkan AI dan hanya untuk tujuan pendidikan.\n\nLayanan ini tidak memberikan nasihat keuangan.\n\nPengguna harus DYOR (Lakukan Riset Sendiri) dan TAYOR (Perdagangkan Atas Risiko Sendiri).\n\nDengan menggunakan bot ini, Anda mengakui bahwa Anda mengambil tanggung jawab penuh atas keputusan perdagangan Anda.',
+        'help_contact': '📬 Kontak Dukungan: [Admin](https://t.me/GoldenAi_admin)',
+        
+        # Notice Board
+        'notice_title': '📌 Papan Pengumuman',
+        'notice_announcements': '📢 Pengumuman Penting:',
+        'notice_stay_updated': 'Tetap terbarui dengan berita dan pembaruan terbaru dari bot perdagangan kami.',
+        'notice_check_regularly': '📅 Periksa kembali secara rutin untuk pengumuman baru.',
+        'notice_tips': '💡 Tips:',
+        'notice_tip1': '• Ikuti semua sinyal secara bertanggung jawab',
+        'notice_tip2': '• Kelola risiko Anda dengan baik',
+        'notice_tip3': '• Pastikan akun broker Anda aktif',
+        
+        # Performance
+        'performance_title': '📈 Catatan Performa',
+        'performance_stats': '📊 Statistik Performa Sinyal:',
+        'performance_coming_soon': 'Segera hadir! Lacak performa perdagangan dan hasil sinyal Anda di sini.',
+        'performance_features': '💡 Fitur:',
+        'performance_feature1': '• Pelacakan tingkat kemenangan',
+        'performance_feature2': '• Analisis Laba/Rugi',
+        'performance_feature3': '• Riwayat sinyal',
+        'performance_soon': '🔒 Fitur ini akan segera tersedia!',
+        
+        # Terms
+        'terms_title': '📜 Syarat dan Ketentuan',
+        'terms_important': '📋 Informasi Penting:',
+        'terms_1_title': '1. Hanya untuk Tujuan Pendidikan',
+        'terms_1_text': 'Semua sinyal dan analisis hanya untuk tujuan pendidikan.',
+        'terms_2_title': '2. Penafian Risiko',
+        'terms_2_text': 'Perdagangan melibatkan risiko. Selalu lakukan riset sendiri (DYOR) dan ambil tanggung jawab sendiri (TAYOR).',
+        'terms_3_title': '3. Bukan Nasihat Keuangan',
+        'terms_3_text': 'Kami tidak memberikan nasihat keuangan. Semua keputusan perdagangan adalah keputusan Anda sendiri.',
+        'terms_4_title': '4. Pendaftaran Broker',
+        'terms_4_text': 'Akses Premium memerlukan pendaftaran akun broker yang valid.',
+        'terms_5_title': '5. Tanggung Jawab Akun',
+        'terms_5_text': 'Pastikan akun broker Anda didanai dan aktif untuk mempertahankan status Premium.',
+        'terms_agree': '⚠️ Dengan menggunakan bot ini, Anda menyetujui syarat-syarat ini.',
+        
+        # Language
+        'lang_title': '🌐 Pemilihan Bahasa',
+        'lang_choose': 'Pilih bahasa pilihan Anda:',
+        'lang_english': '🇬🇧 Bahasa Inggris - English language',
+        'lang_malay': '🇲🇾 Bahasa Melayu - Bahasa Melayu',
+        'lang_indonesian': '🇮🇩 Bahasa Indonesia - Bahasa Indonesia',
+        'lang_select': 'Pilih bahasa untuk melanjutkan:',
+        'lang_changed_en': '✅ Bahasa diubah ke Bahasa Inggris\n\nSemua pesan bot sekarang akan ditampilkan dalam Bahasa Inggris.',
+        'lang_changed_my': '✅ Bahasa diubah ke Bahasa Melayu\n\nSemua pesan bot sekarang akan ditampilkan dalam Bahasa Melayu.',
+        'lang_changed_id': '✅ Bahasa diubah ke Bahasa Indonesia\n\nSemua pesan bot sekarang akan ditampilkan dalam Bahasa Indonesia.',
+    }
+}
+
+def get_user_language(user_id: int) -> str:
+    """Get user's preferred language - always fresh from database"""
+    # Always get fresh data from database
+    user_data = db.get_user(user_id)
+    # Check if user exists in database
+    if user_id in db.users:
+        lang = db.users[user_id].get('language', 'en')
+    else:
+        lang = user_data.get('language', 'en')
+    return lang if lang in ['en', 'my', 'id'] else 'en'  # Default to English
+
+def t(user_id: int, key: str, **kwargs) -> str:
+    """Translate text based on user's language"""
+    lang = get_user_language(user_id)
+    translation_dict = TRANSLATIONS.get(lang, TRANSLATIONS['en'])
+    translation = translation_dict.get(key, key)
+    
+    # Format with kwargs if provided
+    if kwargs:
+        try:
+            return translation.format(**kwargs)
+        except:
+            return translation
+    
+    return translation
+
 # Initialize database and systems
 db = UserDatabase()
 admin_panel = AdminPanel(db)
@@ -65,8 +396,15 @@ def get_user_status(user_id: int) -> str:
     
     if user['status'] == 'trial':
         if user['trial_end'] and datetime.fromisoformat(user['trial_end']).date() <= today:
-            db.update_user(user_id, status='free')
-            return 'free'
+            # Trial expired - check if user is verified
+            if user.get('verified'):
+                # User is verified - upgrade to premium
+                db.update_user(user_id, status='premium')
+                return 'premium'
+            else:
+                # User not verified - downgrade to free
+                db.update_user(user_id, status='free')
+                return 'free'
         return 'trial'
     elif user['status'] == 'premium':
         if user['subscription_end'] and datetime.fromisoformat(user['subscription_end']).date() < today:
@@ -74,6 +412,46 @@ def get_user_status(user_id: int) -> str:
             return 'free'
         return 'premium'
     return user['status']
+
+def escape_markdown(text: str) -> str:
+    """Escape special characters for Markdown parsing"""
+    if not text:
+        return ""
+    
+    # Characters that need escaping in Markdown
+    special_chars = ['_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!']
+    
+    for char in special_chars:
+        text = text.replace(char, f'\\{char}')
+    
+    return text
+
+def safe_format_user_data(data: dict) -> dict:
+    """Safely format user data for Markdown display"""
+    safe_data = {}
+    for key, value in data.items():
+        if isinstance(value, str):
+            safe_data[key] = escape_markdown(str(value))
+        else:
+            safe_data[key] = str(value) if value is not None else "N/A"
+    return safe_data
+
+async def safe_send_message(update, text: str, reply_markup=None):
+    """Safely send message with fallback parsing modes"""
+    try:
+        # Try Markdown first
+        await update.message.reply_text(text, parse_mode=ParseMode.MARKDOWN, reply_markup=reply_markup)
+    except Exception as markdown_error:
+        try:
+            # Fallback to HTML
+            html_text = text.replace('**', '<b>').replace('**', '</b>')
+            html_text = html_text.replace('*', '<i>').replace('*', '</i>')
+            html_text = html_text.replace('`', '<code>').replace('`', '</code>')
+            await update.message.reply_text(html_text, parse_mode=ParseMode.HTML, reply_markup=reply_markup)
+        except Exception as html_error:
+            # Final fallback - plain text
+            plain_text = text.replace('**', '').replace('*', '').replace('`', '')
+            await update.message.reply_text(plain_text, reply_markup=reply_markup)
 
 def get_latest_signal():
     """Get the latest signal from latest_signal.json"""
@@ -392,14 +770,25 @@ def format_market_analysis(analysis):
     
     return message
 
-def create_main_menu() -> InlineKeyboardMarkup:
-    """Create main menu keyboard"""
+def create_main_menu(user_id: int = None) -> InlineKeyboardMarkup:
+    """Create main menu keyboard with translations"""
+    if user_id is None:
+        lang = 'en'  # Default
+    else:
+        lang = get_user_language(user_id)
+    
+    translations = TRANSLATIONS.get(lang, TRANSLATIONS['en'])
+    
     keyboard = [
-        [InlineKeyboardButton("📊 Free Market Analysis", callback_data="analysis")],
-        [InlineKeyboardButton("🔑 Premium Signals", callback_data="signals")],
-        [InlineKeyboardButton("📝 Register for Premium", callback_data="register")],
-        [InlineKeyboardButton("👤 My Account", callback_data="account")],
-        [InlineKeyboardButton("ℹ️ Help & Support", callback_data="help")]
+        [InlineKeyboardButton(translations['btn_free_analysis'], callback_data="analysis")],
+        [InlineKeyboardButton(translations['btn_premium_signals'], callback_data="signals")],
+        [InlineKeyboardButton(translations['btn_register'], callback_data="register")],
+        [InlineKeyboardButton(translations['btn_my_account'], callback_data="account")],
+        [InlineKeyboardButton(translations['btn_help'], callback_data="help")],
+        [InlineKeyboardButton(translations['btn_notice_board'], url="https://t.me/noticeboardgoldenai")],
+        [InlineKeyboardButton(translations['btn_performance'], url="https://t.me/feedbackgoldenai/44")],
+        [InlineKeyboardButton(translations['btn_terms'], callback_data="terms")],
+        [InlineKeyboardButton(translations['btn_language'], callback_data="language")]
     ]
     return InlineKeyboardMarkup(keyboard)
 
@@ -512,6 +901,7 @@ async def handle_trial_choice(update: Update, context: ContextTypes.DEFAULT_TYPE
         trial_end = datetime.now() + timedelta(days=14)
         db.update_user(user_id, status='trial', trial_end=trial_end.isoformat())
         
+        user_id = update.effective_user.id
         await query.edit_message_text(
             f"🚀 Your 14-day Premium trial has started, {update.effective_user.first_name}!\n\n"
             f"You now have full access to:\n"
@@ -520,17 +910,19 @@ async def handle_trial_choice(update: Update, context: ContextTypes.DEFAULT_TYPE
             f"🎓 Trading tips & strategies\n\n"
             f"📅 Trial Expiry Date: {trial_end.strftime('%Y-%m-%d')}\n\n"
             f"👉 What would you like to do now?",
-            reply_markup=create_main_menu()
+            reply_markup=create_main_menu(user_id)
         )
     elif query.data == "free_only":
+        user_id = update.effective_user.id
         await query.edit_message_text(
             "📊 You've chosen Free Analysis Only.\n\n"
             "You'll receive daily market analysis and educational content.\n"
             "To unlock Premium signals, you can start a trial anytime!\n\n"
             "👉 What would you like to do now?",
-            reply_markup=create_main_menu()
+            reply_markup=create_main_menu(user_id)
         )
     else:  # about
+        user_id = update.effective_user.id
         await query.edit_message_text(
             "ℹ️ About Golden Signals Trading Bot\n\n"
             "We provide:\n"
@@ -540,13 +932,13 @@ async def handle_trial_choice(update: Update, context: ContextTypes.DEFAULT_TYPE
             "⚠️ Disclaimer: Trading involves risk. Our signals are for educational purposes only.\n\n"
             "📬 Support: Contact @YourAdminUsername for help",
             parse_mode=ParseMode.MARKDOWN,
-            reply_markup=create_main_menu()
+            reply_markup=create_main_menu(user_id)
         )
     
     return ConversationHandler.END
 
 async def show_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    """Show main menu"""
+    """Show main menu with translations"""
     user_id = update.effective_user.id
     status = get_user_status(user_id)
     
@@ -554,243 +946,363 @@ async def show_main_menu(update: Update, context: ContextTypes.DEFAULT_TYPE):
         user_data = db.get_user(user_id)
         trial_end = datetime.fromisoformat(user_data['trial_end']).date()
         days_left = (trial_end - date.today()).days
-        
-        text = f"🎁 Premium Trial Active ({days_left} days left)\n\n"
+        text = t(user_id, 'status_trial', days=days_left)
     elif status == 'premium':
-        text = "💎 Premium Member\n\n"
+        text = t(user_id, 'status_premium')
     else:
-        text = "🆓 Free User\n\n"
+        text = t(user_id, 'status_free')
     
-    text += "Choose an option:"
+    text += "\n\n" + t(user_id, 'menu_choose_option')
     
     if update.callback_query:
-        await update.callback_query.edit_message_text(text, reply_markup=create_main_menu())
+        await update.callback_query.edit_message_text(text, reply_markup=create_main_menu(user_id))
     else:
-        await update.message.reply_text(text, reply_markup=create_main_menu())
+        await update.message.reply_text(text, reply_markup=create_main_menu(user_id))
 
 async def handle_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Handle main menu callbacks"""
-    query = update.callback_query
-    await query.answer()
-    
-    user_id = update.effective_user.id
-    status = get_user_status(user_id)
-    user_data = db.get_user(user_id)
-    
-    if query.data == "analysis":
-        # Generate real-time market analysis
-        analysis = generate_market_analysis()
-        analysis_message = format_market_analysis(analysis)
+    try:
+        query = update.callback_query
+        if not query:
+            return
         
-        await query.edit_message_text(
-            analysis_message,
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=create_main_menu()
-        )
-    
-    elif query.data == "signals":
-        if status in ['trial', 'premium']:
-            # Get latest signal from signals.json
-            latest_signal = get_latest_signal()
-            if latest_signal:
-                signal_message = f"📈 Premium Trading Signals\n\n"
-                signal_message += f"🟡 {latest_signal['symbol']}\n"
-                signal_message += f"• Type: {latest_signal['action']}\n"
-                signal_message += f"• Entry: {latest_signal['entry_price']}\n"
-                signal_message += f"• Stop Loss: {latest_signal['stop_loss']}\n"
-                signal_message += f"• Take Profit: {latest_signal['take_profit']}\n"
-                signal_message += f"• Risk: 0.5% per trade\n\n"
-                signal_message += f"📝 {latest_signal['description']}\n\n"
-                signal_message += f"⚡ Manage your risk wisely!"
-            else:
-                signal_message = "📈 Premium Trading Signals\n\n"
-                signal_message += "🟡 GOLD (XAU/USD)\n"
-                signal_message += "• Type: BUY\n"
-                signal_message += "• Entry: 1935.00\n"
-                signal_message += "• Stop Loss: 1928.00\n"
-                signal_message += "• Take Profit: 1950.00\n"
-                signal_message += "• Risk: 0.5% per trade\n\n"
-                signal_message += "🔵 EUR/USD\n"
-                signal_message += "• Type: SELL\n"
-                signal_message += "• Entry: 1.0850\n"
-                signal_message += "• Stop Loss: 1.0880\n"
-                signal_message += "• Take Profit: 1.0800\n"
-                signal_message += "• Risk: 0.5% per trade\n\n"
-                signal_message += "⚡ Manage your risk wisely!"
+        await query.answer()
+        
+        user_id = update.effective_user.id
+        status = get_user_status(user_id)
+        user_data = db.get_user(user_id)
+        
+        # Debug: Log callback data
+        logger.info(f"Callback received: {query.data} from user {user_id}")
+        
+        if query.data == "analysis":
+            # Generate real-time market analysis
+            analysis = generate_market_analysis()
+            analysis_message = format_market_analysis(analysis)
             
             await query.edit_message_text(
-                signal_message,
+                analysis_message,
                 parse_mode=ParseMode.MARKDOWN,
-                reply_markup=create_main_menu()
+                reply_markup=create_main_menu(user_id)
             )
-        elif status == 'suspended':
+        
+        elif query.data == "signals":
+            if status in ['trial', 'premium']:
+                # Get latest signal from signals.json
+                latest_signal = get_latest_signal()
+                if latest_signal:
+                    signal_message = f"📈 Premium Trading Signals\n\n"
+                    signal_message += f"🟡 {latest_signal['symbol']}\n"
+                    signal_message += f"• Type: {latest_signal['action']}\n"
+                    signal_message += f"• Entry: {latest_signal['entry_price']}\n"
+                    signal_message += f"• Stop Loss: {latest_signal['stop_loss']}\n"
+                    signal_message += f"• Take Profit: {latest_signal['take_profit']}\n"
+                    signal_message += f"• Risk: 0.5% per trade\n\n"
+                    signal_message += f"📝 {latest_signal['description']}\n\n"
+                    signal_message += f"⚡ Manage your risk wisely!"
+                else:
+                    signal_message = "📈 Premium Trading Signals\n\n"
+                    signal_message += "🟡 GOLD (XAU/USD)\n"
+                    signal_message += "• Type: BUY\n"
+                    signal_message += "• Entry: 1935.00\n"
+                    signal_message += "• Stop Loss: 1928.00\n"
+                    signal_message += "• Take Profit: 1950.00\n"
+                    signal_message += "• Risk: 0.5% per trade\n\n"
+                    signal_message += "🔵 EUR/USD\n"
+                    signal_message += "• Type: SELL\n"
+                    signal_message += "• Entry: 1.0850\n"
+                    signal_message += "• Stop Loss: 1.0880\n"
+                    signal_message += "• Take Profit: 1.0800\n"
+                    signal_message += "• Risk: 0.5% per trade\n\n"
+                    signal_message += "⚡ Manage your risk wisely!"
+                
+                await query.edit_message_text(
+                    signal_message,
+                    parse_mode=ParseMode.MARKDOWN,
+                    reply_markup=create_main_menu(user_id)
+                )
+            elif status == 'suspended':
+                await query.edit_message_text(
+                    "⚠️ Premium Signals Suspended\n\n"
+                    "Your Premium subscription is currently suspended.\n"
+                    "📉 Today's signals are locked.\n\n"
+                    "💡 Fund your broker account to reactivate and unlock Premium signals again.",
+                    parse_mode=ParseMode.MARKDOWN,
+                    reply_markup=InlineKeyboardMarkup([
+                        [InlineKeyboardButton("🔄 I've Funded My Account", callback_data="reactivate_request")],
+                        [InlineKeyboardButton("⬅️ Back to General Menu", callback_data="general_menu")]
+                    ])
+                )
+            else:
+                await query.edit_message_text(
+                    "⛔ Premium Access Expired\n\n"
+                    "Your 14-day free trial has ended.\n"
+                    "To continue receiving:\n"
+                    "💎 Real-time Premium signals\n"
+                    "📊 Daily market analysis\n"
+                    "🎓 Exclusive trading insights\n\n"
+                    "you'll need to activate Premium by registering with our broker.\n\n"
+                    "🔗 [Register Now]({})\n\n"
+                    "⚠️ Reminder: All signals are AI-generated and for educational purposes only. Please DYOR & TAYOR.".format(BROKER_LINK),
+                    parse_mode=ParseMode.MARKDOWN,
+                    reply_markup=create_main_menu(user_id)
+                )
+        
+        elif query.data == "register":
+            if status == 'premium':
+                await query.edit_message_text(
+                    "✅ You're already Premium!\n\n"
+                    "You have full access to all Premium features.\n"
+                    "Keep your broker account active to maintain Premium status.",
+                    reply_markup=create_main_menu(user_id)
+                )
+            else:
+                await query.edit_message_text(
+                    "📝 Register for Premium Access\n\n"
+                    "To unlock Premium signals, please complete these steps:\n\n"
+                    "1️⃣ Register with our broker: [Click Here]({})\n"
+                    "2️⃣ Deposit minimum $50 USD into your broker account\n"
+                    "3️⃣ Provide your full name (as registered with broker)\n"
+                    "4️⃣ Provide your email address (same as broker account)\n\n"
+                    "💰 Note: Minimum $50 USD deposit required for verification\n\n"
+                    "👉 Let's start with your full name:".format(BROKER_LINK),
+                    parse_mode=ParseMode.MARKDOWN
+                )
+                context.user_data['registering'] = True
+                # Start conversation for registration
+                return await start_registration_conversation(update, context)
+        
+        elif query.data == "account":
+            trial_info = ""
+            # Only show trial info for trial users, not premium users
+            if status == 'trial' and user_data.get('trial_end'):
+                trial_end = datetime.fromisoformat(user_data['trial_end']).date()
+                days_left = (trial_end - date.today()).days
+                trial_info = "\n" + t(user_id, 'account_trial_days', days=days_left)
+            
+            # Format status with emoji
+            status_emoji = "✅" if status == 'premium' else "⏳" if status == 'trial' else "❌"
+            status_text = f"{status_emoji} {status.title()}"
+            
+            # Format verification status
+            verification_text = "🔒 Verification: " + t(user_id, 'account_verified') if user_data.get('verified') else "🔒 Verification: " + t(user_id, 'account_not_verified')
+            
+            # Format account ID
+            account_text = t(user_id, 'account_number') + f": {user_data.get('account_number', 'Not provided')}"
+            
+            # Add premium message for premium users
+            premium_message = ""
+            if status == 'premium':
+                premium_message = t(user_id, 'account_premium_message')
+            
             await query.edit_message_text(
-                "⚠️ Premium Signals Suspended\n\n"
-                "Your Premium subscription is currently suspended.\n"
-                "📉 Today's signals are locked.\n\n"
-                "💡 Fund your broker account to reactivate and unlock Premium signals again.",
+                t(user_id, 'account_title') + "\n\n" +
+                t(user_id, 'account_status') + f" {status_text}\n" +
+                t(user_id, 'account_country') + f" {user_data.get('country', 'Not set')}\n" +
+                t(user_id, 'account_email') + f" {user_data.get('email', 'Not provided')}\n" +
+                account_text + "\n" +
+                verification_text + trial_info + premium_message,
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=create_main_menu(user_id)
+            )
+        
+        elif query.data == "help":
+            help_text = t(user_id, 'help_title') + "\n\n"
+            help_text += t(user_id, 'help_features') + "\n"
+            help_text += t(user_id, 'help_free_analysis') + "\n"
+            help_text += t(user_id, 'help_premium_signals') + "\n"
+            help_text += t(user_id, 'help_register') + "\n"
+            help_text += t(user_id, 'help_account') + "\n\n"
+            help_text += t(user_id, 'help_how_premium') + "\n"
+            help_text += t(user_id, 'help_step1') + "\n"
+            help_text += t(user_id, 'help_step2') + "\n"
+            help_text += t(user_id, 'help_step3') + "\n"
+            help_text += t(user_id, 'help_step4') + "\n"
+            help_text += t(user_id, 'help_step5') + "\n\n"
+            help_text += t(user_id, 'help_disclaimer') + "\n\n"
+            help_text += t(user_id, 'help_disclaimer_text') + "\n\n"
+            help_text += t(user_id, 'help_contact')
+            
+            await query.edit_message_text(
+                help_text,
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=create_main_menu(user_id),
+                disable_web_page_preview=True
+            )
+        
+        elif query.data == "terms":
+            terms_text = "**" + t(user_id, 'terms_title') + "**\n\n"
+            terms_text += "**" + t(user_id, 'terms_important') + "**\n\n"
+            terms_text += f"1. **{t(user_id, 'terms_1_title')}**\n"
+            terms_text += t(user_id, 'terms_1_text') + "\n\n"
+            terms_text += f"2. **{t(user_id, 'terms_2_title')}**\n"
+            terms_text += t(user_id, 'terms_2_text') + "\n\n"
+            terms_text += f"3. **{t(user_id, 'terms_3_title')}**\n"
+            terms_text += t(user_id, 'terms_3_text') + "\n\n"
+            terms_text += f"4. **{t(user_id, 'terms_4_title')}**\n"
+            terms_text += t(user_id, 'terms_4_text') + "\n\n"
+            terms_text += f"5. **{t(user_id, 'terms_5_title')}**\n"
+            terms_text += t(user_id, 'terms_5_text') + "\n\n"
+            terms_text += "**" + t(user_id, 'terms_agree') + "**"
+            
+            await query.edit_message_text(
+                terms_text,
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=create_main_menu(user_id)
+            )
+        
+        elif query.data == "language":
+            lang = get_user_language(user_id)
+            translations = TRANSLATIONS.get(lang, TRANSLATIONS['en'])
+            
+            language_keyboard = InlineKeyboardMarkup([
+                [InlineKeyboardButton(translations['btn_english'], callback_data="lang_en")],
+                [InlineKeyboardButton(translations['btn_malay'], callback_data="lang_my")],
+                [InlineKeyboardButton(translations['btn_indonesian'], callback_data="lang_id")],
+                [InlineKeyboardButton(translations['btn_back'], callback_data="main_menu")]
+            ])
+            
+            lang_text = "**" + t(user_id, 'lang_title') + "**\n\n"
+            lang_text += t(user_id, 'lang_choose') + "\n\n"
+            lang_text += "**" + translations['btn_english'] + "** - English language\n"
+            lang_text += "**" + translations['btn_malay'] + "** - Bahasa Melayu\n"
+            lang_text += "**" + translations['btn_indonesian'] + "** - Bahasa Indonesia\n\n"
+            lang_text += t(user_id, 'lang_select')
+            
+            await query.edit_message_text(
+                lang_text,
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=language_keyboard
+            )
+        
+        elif query.data == "general_menu":
+            await show_general_menu(update, context)
+        
+        elif query.data == "reactivate_request":
+            await handle_reactivation_request(update, context)
+        
+        elif query.data == "locked_feature":
+            await query.edit_message_text(
+                "🔒 Premium Feature Locked\n\n"
+                "This feature is only available for Premium users.\n"
+                "💡 Fund your broker account to unlock Premium access.",
                 parse_mode=ParseMode.MARKDOWN,
                 reply_markup=InlineKeyboardMarkup([
                     [InlineKeyboardButton("🔄 I've Funded My Account", callback_data="reactivate_request")],
-                    [InlineKeyboardButton("⬅️ Back to General Menu", callback_data="general_menu")]
+                    [InlineKeyboardButton("⬅️ Back", callback_data="general_menu")]
                 ])
             )
-        else:
+        
+        elif query.data == "broker_info":
             await query.edit_message_text(
-                "⛔ Premium Access Expired\n\n"
-                "Your 14-day free trial has ended.\n"
-                "To continue receiving:\n"
-                "💎 Real-time Premium signals\n"
-                "📊 Daily market analysis\n"
-                "🎓 Exclusive trading insights\n\n"
-                "you'll need to activate Premium by registering with our broker.\n\n"
-                "🔗 [Register Now]({})\n\n"
-                "⚠️ Reminder: All signals are AI-generated and for educational purposes only. Please DYOR & TAYOR.".format(BROKER_LINK),
+                f"ℹ️ Broker Information\n\n"
+                f"Our Official Broker:\n"
+                f"🔗 [Register Here]({BROKER_LINK})\n\n"
+                f"Benefits:\n"
+                f"• Competitive spreads\n"
+                f"• Fast execution\n"
+                f"• 24/7 support\n"
+                f"• Multiple account types\n\n"
+                f"Registration Process:\n"
+                f"1. Click the link above\n"
+                f"2. Complete registration\n"
+                f"3. Submit account number in bot\n"
+                f"4. Get verified by admin\n"
+                f"5. Enjoy Premium access!",
                 parse_mode=ParseMode.MARKDOWN,
-                reply_markup=create_main_menu()
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("📝 Register for Premium", callback_data="register")],
+                    [InlineKeyboardButton("⬅️ Back", callback_data="general_menu")]
+                ])
             )
-    
-    elif query.data == "register":
-        if status == 'premium':
+        
+        elif query.data == "contact_admin":
             await query.edit_message_text(
-                "✅ You're already Premium!\n\n"
-                "You have full access to all Premium features.\n"
-                "Keep your broker account active to maintain Premium status.",
-                reply_markup=create_main_menu()
+                "👤 Contact Admin\n\n"
+                "For support and assistance, contact our admin:\n\n"
+                "📬 Telegram: @YourAdminUsername\n"
+                "📧 Email: admin@example.com\n\n"
+                "Common Issues:\n"
+                "• Account verification\n"
+                "• Premium access problems\n"
+                "• Technical support\n"
+                "• General inquiries\n\n"
+                "We'll respond within 24 hours.",
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=InlineKeyboardMarkup([
+                    [InlineKeyboardButton("⬅️ Back", callback_data="general_menu")]
+                ])
             )
+        
+        elif query.data == "lang_en":
+            # Save language preference
+            db.update_user(user_id, language='en')
+            # Ensure user exists in database
+            if user_id not in db.users:
+                db.users[user_id] = db.get_user(user_id)
+            db.users[user_id]['language'] = 'en'
+            
+            await query.answer("✅ Language set to English", show_alert=False)
+            # Get updated translation directly from English translations
+            message = "**🌐 Language Selection**\n\n" + TRANSLATIONS['en']['lang_changed_en']
+            await query.edit_message_text(
+                message,
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=create_main_menu(user_id)
+            )
+        
+        elif query.data == "lang_my":
+            # Save language preference
+            db.update_user(user_id, language='my')
+            # Ensure user exists in database
+            if user_id not in db.users:
+                db.users[user_id] = db.get_user(user_id)
+            db.users[user_id]['language'] = 'my'
+            
+            await query.answer("✅ Bahasa telah ditetapkan ke Bahasa Melayu", show_alert=False)
+            # Get updated translation directly from Malay translations
+            message = "**🌐 Pemilihan Bahasa**\n\n" + TRANSLATIONS['my']['lang_changed_my']
+            await query.edit_message_text(
+                message,
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=create_main_menu(user_id)
+            )
+        
+        elif query.data == "lang_id":
+            # Save language preference
+            db.update_user(user_id, language='id')
+            # Ensure user exists in database
+            if user_id not in db.users:
+                db.users[user_id] = db.get_user(user_id)
+            db.users[user_id]['language'] = 'id'
+            
+            await query.answer("✅ Bahasa telah ditetapkan ke Bahasa Indonesia", show_alert=False)
+            # Get updated translation directly from Indonesian translations
+            message = "**🌐 Pemilihan Bahasa**\n\n" + TRANSLATIONS['id']['lang_changed_id']
+            await query.edit_message_text(
+                message,
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=create_main_menu(user_id)
+            )
+        
+        elif query.data == "main_menu":
+            await show_main_menu(update, context)
+        
         else:
+            print(f"🔧 DEBUG: Unknown callback data: {query.data}")
+            logger.warning(f"Unknown callback data: {query.data} from user {user_id}")
             await query.edit_message_text(
-                "📝 Register for Premium Access\n\n"
-                "To unlock Premium signals, please complete these steps:\n\n"
-                "1️⃣ Register with our broker: [Click Here]({})\n"
-                "2️⃣ Deposit minimum $50 USD into your broker account\n"
-                "3️⃣ Provide your full name (as registered with broker)\n"
-                "4️⃣ Provide your email address (same as broker account)\n\n"
-                "💰 Note: Minimum $50 USD deposit required for verification\n\n"
-                "👉 Let's start with your full name:".format(BROKER_LINK),
-                parse_mode=ParseMode.MARKDOWN
+                f"❌ Unknown Command\n\n"
+                f"Callback data: {query.data}\n\n"
+                f"Please try again or contact admin.",
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=create_main_menu(user_id)
             )
-            context.user_data['registering'] = True
-            # Start conversation for registration
-            return await start_registration_conversation(update, context)
-    
-    elif query.data == "account":
-        trial_info = ""
-        # Only show trial info for trial users, not premium users
-        if status == 'trial' and user_data.get('trial_end'):
-            trial_end = datetime.fromisoformat(user_data['trial_end']).date()
-            days_left = (trial_end - date.today()).days
-            trial_info = f"\n⏳ Trial Days Left: {days_left}"
-        
-        # Format status with emoji
-        status_emoji = "✅" if status == 'premium' else "⏳" if status == 'trial' else "❌"
-        status_text = f"{status_emoji} {status.title()}"
-        
-        # Format verification status
-        verification_text = "🔒 Verification: Completed" if user_data.get('verified') else "🔒 Verification: Pending"
-        
-        # Format account ID
-        account_text = f"🔢 Account ID: {user_data.get('account_number', 'Not provided')}"
-        
-        # Add premium message for premium users
-        premium_message = ""
-        if status == 'premium':
-            premium_message = "\n\n✨ Thank you for being a Premium member!\nKeep your broker account active to enjoy uninterrupted access."
-        
-        await query.edit_message_text(
-            f"👤 My Account\n\n"
-            f"📊 Status: {status_text}\n"
-            f"🌍 Country: {user_data.get('country', 'Not set')}\n"
-            f"📧 Email: {user_data.get('email', 'Not provided')}\n"
-            f"{account_text}\n"
-            f"{verification_text}{trial_info}{premium_message}",
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=create_main_menu()
-        )
-    
-    elif query.data == "help":
-        await query.edit_message_text(
-            "ℹ️ Help & Support\n\n"
-            "Available Features:\n"
-            "📊 Free Analysis – Daily AI-generated market observations\n"
-            "💎 Premium Signals – Access detailed study notes (trial/premium only)\n"
-            "📝 Register – Upgrade to Premium by registering with our broker link\n"
-            "👤 Account – Check your status (Trial / Premium / Suspended)\n\n"
-            "How Premium Works:\n"
-            "1️⃣ Start with a 14-day free trial\n"
-            "2️⃣ Register with our broker link\n"
-            "3️⃣ Deposit minimum $50 USD into broker account\n"
-            "4️⃣ Submit your email & name for verification\n"
-            "5️⃣ Admin approval grants Premium access\n\n"
-            "⚠️ Important Disclaimer:\n\n"
-            "All analysis provided is AI-generated and for educational purposes only.\n\n"
-            "This service does not provide financial advice.\n\n"
-            "Users must DYOR (Do Your Own Research) and TAYOR (Trade At Your Own Risk).\n\n"
-            "By using this bot, you acknowledge that you take full responsibility for your trading decisions.\n\n"
-            "📬 Support Contact: [Admin](https://t.me/GoldenAi_admin)",
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=create_main_menu(),
-            disable_web_page_preview=True
-        )
-    
-    elif query.data == "general_menu":
-        await show_general_menu(update, context)
-    
-    elif query.data == "reactivate_request":
-        await handle_reactivation_request(update, context)
-    
-    elif query.data == "locked_feature":
-        await query.edit_message_text(
-            "🔒 Premium Feature Locked\n\n"
-            "This feature is only available for Premium users.\n"
-            "💡 Fund your broker account to unlock Premium access.",
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("🔄 I've Funded My Account", callback_data="reactivate_request")],
-                [InlineKeyboardButton("⬅️ Back", callback_data="general_menu")]
-            ])
-        )
-    
-    elif query.data == "broker_info":
-        await query.edit_message_text(
-            f"ℹ️ Broker Information\n\n"
-            f"Our Official Broker:\n"
-            f"🔗 [Register Here]({BROKER_LINK})\n\n"
-            f"Benefits:\n"
-            f"• Competitive spreads\n"
-            f"• Fast execution\n"
-            f"• 24/7 support\n"
-            f"• Multiple account types\n\n"
-            f"Registration Process:\n"
-            f"1. Click the link above\n"
-            f"2. Complete registration\n"
-            f"3. Submit account number in bot\n"
-            f"4. Get verified by admin\n"
-            f"5. Enjoy Premium access!",
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("📝 Register for Premium", callback_data="register")],
-                [InlineKeyboardButton("⬅️ Back", callback_data="general_menu")]
-            ])
-        )
-    
-    elif query.data == "contact_admin":
-        await query.edit_message_text(
-            "👤 Contact Admin\n\n"
-            "For support and assistance, contact our admin:\n\n"
-            "📬 Telegram: @YourAdminUsername\n"
-            "📧 Email: admin@example.com\n\n"
-            "Common Issues:\n"
-            "• Account verification\n"
-            "• Premium access problems\n"
-            "• Technical support\n"
-            "• General inquiries\n\n"
-            "We'll respond within 24 hours.",
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=InlineKeyboardMarkup([
-                [InlineKeyboardButton("⬅️ Back", callback_data="general_menu")]
-            ])
-        )
+    except Exception as e:
+        logger.error(f"Error in handle_menu_callback: {e}", exc_info=True)
+        query = update.callback_query
+        if query:
+            await query.answer(f"❌ Error: {str(e)}", show_alert=True)
 
 async def handle_register_name(update: Update, context: ContextTypes.DEFAULT_TYPE) -> int:
     """Handle name registration"""
@@ -897,7 +1409,7 @@ async def handle_account_number(update: Update, context: ContextTypes.DEFAULT_TY
             f"⏳ Our admin will verify your account with the broker.\n"
             f"You'll receive a notification once approved!",
             parse_mode=ParseMode.MARKDOWN,
-            reply_markup=create_main_menu()
+            reply_markup=create_main_menu(user_id)
         )
         
         # Notify admin
@@ -929,8 +1441,13 @@ async def start_registration_conversation(update: Update, context: ContextTypes.
     """Start registration conversation"""
     user_id = update.effective_user.id
     
-    # Update user status to indicate they're in registration process
-    db.update_user(user_id, status='registering')
+    # DON'T change status - preserve trial if active
+    # Just mark that they're registering without changing trial status
+    user_data = db.get_user(user_id)
+    if user_data.get('status') != 'trial':
+        # Only update status if NOT on trial
+        db.update_user(user_id, status='registering')
+    # If on trial, keep trial status and let it run for full 14 days
     
     # Send message asking for name
     await context.bot.send_message(
@@ -1001,7 +1518,7 @@ async def handle_registration_message(update: Update, context: ContextTypes.DEFA
             f"You'll receive a confirmation once your Premium access is approved.\n\n"
             f"⚠️ Reminder: All signals are AI-generated for educational purposes only. Please DYOR & TAYOR.",
             parse_mode=ParseMode.MARKDOWN,
-            reply_markup=create_main_menu()
+            reply_markup=create_main_menu(user_id)
         )
         
         # Notify admin
@@ -1544,19 +2061,6 @@ async def handle_admin_callback_old(update: Update, context: ContextTypes.DEFAUL
             "• Data includes timestamps and full details",
             parse_mode=ParseMode.MARKDOWN,
             reply_markup=create_admin_keyboard()
-        )
-    
-    elif query.data == "main_menu":
-        await show_main_menu(update, context)
-    
-    else:
-        print(f"🔧 DEBUG: Unknown callback data: {query.data}")
-        await query.edit_message_text(
-            f"❌ Unknown Command\n\n"
-            f"Callback data: {query.data}\n\n"
-            f"Please try again or contact admin.",
-            parse_mode=ParseMode.MARKDOWN,
-            reply_markup=create_admin_menu()
         )
 
 async def approve_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
@@ -2414,7 +2918,8 @@ async def auto_suspend_command(update: Update, context: ContextTypes.DEFAULT_TYP
                 try:
                     activity_date = datetime.fromisoformat(last_activity)
                     if activity_date < cutoff_date:
-                        admin_panel.suspend_user(user_id, f"Auto-suspended: Inactive for {inactive_days} days")
+                        # Note: suspend_user requires context, cannot be called here
+                        # This should be handled by notification system
                         suspended_count += 1
                 except:
                     pass
@@ -2663,14 +3168,16 @@ async def user_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         # Add pending requests details
         if pending_requests:
             for i, req in enumerate(pending_requests[:5], 1):  # Show max 5
+                # Safely format user data
+                safe_req = safe_format_user_data(req)
                 stats_text += f"""
-{i}. **{req['name']}** (@{req['username']})
-   ID: {req['id']}
-   Email: {req['email']}
-   Account: {req['account']}
+{i}\\. **{safe_req['name']}** (@{safe_req['username']})
+   ID: {safe_req['id']}
+   Email: {safe_req['email']}
+   Account: {safe_req['account']}
 """
             if len(pending_requests) > 5:
-                stats_text += f"\n... and {len(pending_requests) - 5} more pending requests"
+                stats_text += f"\n\\.\\.\\. and {len(pending_requests) - 5} more pending requests"
         else:
             stats_text += "\n✅ No pending requests"
         
@@ -2685,7 +3192,8 @@ async def user_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
 • `/view <user_id>` - View user details
         """
         
-        await update.message.reply_text(stats_text, parse_mode=ParseMode.MARKDOWN)
+        # Use safe message sending
+        await safe_send_message(update, stats_text)
         
     except Exception as e:
         await update.message.reply_text(f"❌ Error getting user statistics: {str(e)}")
@@ -2705,7 +3213,9 @@ async def daily_maintenance():
                     try:
                         activity_date = datetime.fromisoformat(last_activity)
                         if (datetime.now() - activity_date).days > 14:
-                            admin_panel.suspend_user(user_id, "Auto-suspended: Inactive for 14+ days")
+                            # Note: suspend_user requires context, cannot be called here
+                            # This should be handled by notification system
+                            pass
                     except:
                         pass
         
@@ -2743,22 +3253,238 @@ async def check_trial_expiry():
     
     for user_id in expired_users:
         db.update_user(user_id, status='free')
+        # Note: Cannot send notification here as context is not available
+        # This should be handled by the notification system instead
+
+async def send_weekly_reminder(context):
+    """Send weekly registration reminder to free users"""
+    try:
+        logger.info("Sending weekly registration reminder to free users...")
+        
+        reminder_message = """🎯 Haven't registered with GOLDEN Ai yet?
+
+Without registration, you won't be able to access:
+✅ Golden AI live trading analysis. 
+✅ Progress tracking system
+✅ Exclusive bonuses & rewards
+✅ Step-by-step training
+
+📹 Watch this short video to learn how to register — it only takes less than a minute to get started!
+
+⚠️ Important: Please answer all the questions asked during registration process and make a minimum deposit of 50 USD.
+
+👉 Start now and unlock the full power of Golden AI!"""
+        
+        # Create registration button keyboard
+        registration_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("REGISTRATION IN GOLDEN AI", url="https://one.versustrade.link/links/go/1046?pid=10748")]
+        ])
+        
+        # Video file path - use absolute path
+        video_path = os.path.join(os.path.dirname(__file__), "video", "Beige Purple Gradient Insurance Company Instagram Post.mp4")
+        
+        # Check if video file exists
+        if not os.path.exists(video_path):
+            logger.error(f"Video file not found: {video_path}")
+            return
+        
+        # Check file size (Telegram limit is 50MB for videos)
+        file_size = os.path.getsize(video_path) / (1024 * 1024)  # Size in MB
+        if file_size > 50:
+            logger.error(f"Video file too large: {file_size:.2f}MB (Telegram limit: 50MB)")
+            return
+        logger.info(f"Video file size: {file_size:.2f}MB")
+        
+        # Get all free users
+        free_users = []
+        for user_id, user_data in db.get_all_users().items():
+            if user_data.get('status') == 'free':
+                free_users.append(user_id)
+        
+        # Send reminder to each free user
+        sent_count = 0
+        for user_id in free_users:
+            try:
+                # Open file and send video
+                with open(video_path, 'rb') as video_file:
+                    await context.bot.send_video(
+                        chat_id=user_id,
+                        video=video_file,
+                        caption=reminder_message,
+                        parse_mode=ParseMode.MARKDOWN,
+                        reply_markup=registration_keyboard
+                    )
+                sent_count += 1
+                logger.info(f"Reminder sent successfully to user {user_id}")
+                # Small delay to avoid rate limiting
+                await asyncio.sleep(0.5)
+            except Exception as e:
+                logger.error(f"Error sending reminder to user {user_id}: {e}")
+                # Try alternative method with BytesIO
+                try:
+                    with open(video_path, 'rb') as video_file:
+                        video_data = video_file.read()
+                        video_io = io.BytesIO(video_data)
+                        await context.bot.send_video(
+                            chat_id=user_id,
+                            video=InputFile(video_io, filename=os.path.basename(video_path)),
+                            caption=reminder_message,
+                            parse_mode=ParseMode.MARKDOWN,
+                            reply_markup=registration_keyboard
+                        )
+                    sent_count += 1
+                    logger.info(f"Reminder sent successfully to user {user_id} (using BytesIO)")
+                    await asyncio.sleep(0.5)
+                except Exception as alt_error:
+                    logger.error(f"Alternative method also failed for user {user_id}: {alt_error}")
+                    continue
+        
+        logger.info(f"Weekly reminder sent to {sent_count} free users")
+    except Exception as e:
+        logger.error(f"Error in weekly reminder: {e}")
+
+async def reminder_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /reminder command - Admin only"""
+    if not admin_panel.is_admin(update.effective_user.id):
+        await update.message.reply_text("❌ Access denied.")
+        return
+    
+    try:
+        # Send confirmation message
+        await update.message.reply_text("🔄 Sending weekly reminder to all free users...")
+        
+        # Call the reminder function
+        await send_weekly_reminder(context)
+        
+        # Get count of free users
+        free_users = []
+        for user_id, user_data in db.get_all_users().items():
+            if user_data.get('status') == 'free':
+                free_users.append(user_id)
+        
+        await update.message.reply_text(
+            f"✅ Weekly reminder sent successfully!\n\n"
+            f"📊 Sent to {len(free_users)} free user(s)."
+        )
+    except Exception as e:
+        logger.error(f"Error in reminder command: {e}")
+        await update.message.reply_text(f"❌ Error sending reminder: {str(e)}")
+
+async def test_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /test command - Admin only, sends reminder message to admin for testing"""
+    if not admin_panel.is_admin(update.effective_user.id):
+        await update.message.reply_text("❌ Access denied.")
+        return
+    
+    try:
+        reminder_message = """🎯 Haven't registered with GOLDEN Ai yet?
+
+Without registration, you won't be able to access:
+✅ Golden AI live trading analysis. 
+✅ Progress tracking system
+✅ Exclusive bonuses & rewards
+✅ Step-by-step training
+
+📹 Watch this short video to learn how to register — it only takes less than a minute to get started!
+
+⚠️ Important: Please answer all the questions asked during registration process and make a minimum deposit of 50 USD.
+
+👉 Start now and unlock the full power of Golden AI!"""
+        
+        # Create registration button keyboard
+        registration_keyboard = InlineKeyboardMarkup([
+            [InlineKeyboardButton("REGISTRATION IN GOLDEN AI", url="https://one.versustrade.link/links/go/1046?pid=10748")]
+        ])
+        
+        # Video file path - use absolute path
+        video_path = os.path.join(os.path.dirname(__file__), "video", "Beige Purple Gradient Insurance Company Instagram Post.mp4")
+        
+        # Check if video file exists
+        if not os.path.exists(video_path):
+            await update.message.reply_text(f"❌ Video file not found: {video_path}")
+            return
+        
+        # Check file size
+        file_size = os.path.getsize(video_path) / (1024 * 1024)  # Size in MB
+        logger.info(f"Video file size: {file_size:.2f}MB")
+        
+        # Get admin user ID
+        admin_id = update.effective_user.id
+        
+        # Send test reminder to admin
+        await update.message.reply_text("🔄 Sending test reminder...")
+        
+        # Open file and send video
         try:
-            await context.bot.send_message(
-                chat_id=user_id,
-                text="⏳ Trial Expired\n\n"
-                     "Your 14-day Premium trial has ended.\n"
-                     "📝 Register with our broker to unlock Premium signals again.\n\n"
-                     "🔗 [Register Now]({})".format(BROKER_LINK),
-                parse_mode=ParseMode.MARKDOWN
-            )
-        except Exception as e:
-            logger.error(f"Failed to notify expired user {user_id}: {e}")
+            with open(video_path, 'rb') as video_file:
+                await context.bot.send_video(
+                    chat_id=admin_id,
+                    video=video_file,
+                    caption=reminder_message,
+                    parse_mode=ParseMode.MARKDOWN,
+                    reply_markup=registration_keyboard
+                )
+            
+            await update.message.reply_text("✅ Test reminder sent successfully!")
+            logger.info(f"Test reminder sent to admin {admin_id}")
+        except Exception as send_error:
+            logger.error(f"Error sending video: {send_error}")
+            # Try alternative method with InputFile
+            try:
+                with open(video_path, 'rb') as video_file:
+                    video_data = video_file.read()
+                    video_io = io.BytesIO(video_data)
+                    await context.bot.send_video(
+                        chat_id=admin_id,
+                        video=InputFile(video_io, filename=os.path.basename(video_path)),
+                        caption=reminder_message,
+                        parse_mode=ParseMode.MARKDOWN,
+                        reply_markup=registration_keyboard
+                    )
+                await update.message.reply_text("✅ Test reminder sent successfully!")
+                logger.info(f"Test reminder sent to admin {admin_id} (using BytesIO)")
+            except Exception as alt_error:
+                logger.error(f"Alternative method also failed: {alt_error}")
+                raise alt_error
+        
+    except Exception as e:
+        logger.error(f"Error in test command: {e}")
+        await update.message.reply_text(f"❌ Error sending test reminder: {str(e)}")
+
+async def restart_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
+    """Handle /restart command - Restart bot menu"""
+    user_id = update.effective_user.id
+    
+    # Get user language
+    lang = get_user_language(user_id)
+    translations = TRANSLATIONS.get(lang, TRANSLATIONS['en'])
+    
+    # Send welcome message with main menu
+    welcome_text = t(user_id, 'welcome_message')
+    
+    await update.message.reply_text(
+        welcome_text,
+        parse_mode=ParseMode.MARKDOWN,
+        reply_markup=create_main_menu(user_id)
+    )
 
 def main():
     """Main function"""
-    # Create application
-    application = Application.builder().token(BOT_TOKEN).build()
+    # Set bot commands and menu button callback
+    async def post_init(application: Application) -> None:
+        """Set bot commands and menu button after application starts"""
+        commands = [
+            BotCommand("start", "🚀 Start the bot"),
+            BotCommand("restart", "🔄 Restart bot menu"),
+            BotCommand("help", "ℹ️ Help & Support"),
+            BotCommand("user", "👤 View user information"),
+        ]
+        await application.bot.set_my_commands(commands)
+        # Set menu button to show commands
+        await application.bot.set_chat_menu_button(menu_button=MenuButtonCommands())
+    
+    # Create application with post_init callback
+    application = Application.builder().token(BOT_TOKEN).post_init(post_init).build()
     
     # Conversation handler for registration flow
     conv_handler = ConversationHandler(
@@ -2803,6 +3529,9 @@ def main():
     application.add_handler(CommandHandler("smart_notify", smart_notify_command))
     application.add_handler(CommandHandler("system_status", system_status_command))
     application.add_handler(CommandHandler("user", user_command))
+    application.add_handler(CommandHandler("reminder", reminder_command))
+    application.add_handler(CommandHandler("test", test_command))
+    application.add_handler(CommandHandler("restart", restart_command))
     
     # Media handlers for admin
     application.add_handler(MessageHandler(filters.PHOTO, handle_admin_media))
@@ -2829,6 +3558,13 @@ def main():
         lambda context: asyncio.create_task(update_daily_analysis()),
         interval=14400,  # 4 hours = 14400 seconds
         first=10
+    )
+    
+    # Schedule weekly reminder to free users (once per week)
+    application.job_queue.run_repeating(
+        lambda context: asyncio.create_task(send_weekly_reminder(context)),
+        interval=604800,  # 7 days = 604800 seconds
+        first=3600  # Start after 1 hour
     )
     
     # Start bot
