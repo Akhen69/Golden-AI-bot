@@ -3,9 +3,6 @@
 # Backup directory
 backups/
 
-# Video files
-video/
-
 # Python
 __pycache__/
 *.py[cod]
