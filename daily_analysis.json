@@ -1,12 +1,12 @@
 {
-  "timestamp": "2025-11-05 20:32:31",
+  "timestamp": "2025-11-06 10:28:08",
   "instruments": {
     "GOLD": {
       "symbol": "GOLD (XAU/USD)",
-      "current_price": 3991.2,
+      "current_price": 3993.7,
       "trend": "Bullish",
       "rsi_condition": "Neutral",
-      "price_change": 1.1,
+      "price_change": 1.17,
       "resistance_1": 4034.0,
       "resistance_2": 4044.0,
       "support_1": 3927.0,

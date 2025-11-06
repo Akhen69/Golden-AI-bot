@@ -7,6 +7,8 @@ Database management for Telegram Trading Bot
 import json
 import os
 import shutil
+import threading
+import time
 from datetime import datetime, date
 from typing import Dict, Any, List, Optional
 import logging
@@ -21,6 +23,14 @@ class UserDatabase:
         self.backup_dir = backup_dir
         self.users = self.load_users()
         self.ensure_backup_dir()
+        
+        # Debounced save mechanism
+        self._save_pending = False
+        self._save_lock = threading.Lock()
+        self._last_backup = None
+        self._save_thread = None
+        self._save_interval = 5  # Save every 5 seconds
+        self._shutdown = False
     
     def ensure_backup_dir(self):
         """Create backup directory if it doesn't exist"""
@@ -39,19 +49,51 @@ class UserDatabase:
             logger.error(f"Error loading users: {e}")
         return {}
     
-    def save_users(self):
-        """Save users to JSON file with backup"""
+    def save_users(self, immediate: bool = False):
+        """Save users to JSON file with backup (debounced unless immediate=True)"""
+        with self._save_lock:
+            self._save_pending = True
+        
+        if immediate:
+            self._perform_save()
+        else:
+            # Start background save thread if not running
+            if self._save_thread is None or not self._save_thread.is_alive():
+                self._save_thread = threading.Thread(target=self._background_save, daemon=True)
+                self._save_thread.start()
+    
+    def _background_save(self):
+        """Background thread for debounced saves"""
+        while not self._shutdown:
+            time.sleep(self._save_interval)
+            
+            with self._save_lock:
+                if self._save_pending:
+                    self._perform_save()
+                    self._save_pending = False
+    
+    def _perform_save(self):
+        """Perform the actual save operation"""
         try:
-            # Create backup before saving
-            self.create_backup()
+            # Only create backup once per minute (not every save)
+            should_backup = False
+            now = time.time()
+            if self._last_backup is None or (now - self._last_backup) > 60:
+                should_backup = True
+                self._last_backup = now
+            
+            if should_backup:
+                self.create_backup()
             
             with open(self.filename, 'w', encoding='utf-8') as f:
                 json.dump(self.users, f, indent=2, ensure_ascii=False, default=str)
+            
+            logger.debug(f"Users database saved ({len(self.users)} users)")
         except Exception as e:
             logger.error(f"Error saving users: {e}")
     
     def create_backup(self):
-        """Create backup of current database"""
+        """Create backup of current database (optimized - only when needed)"""
         try:
             if os.path.exists(self.filename):
                 timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
@@ -59,8 +101,8 @@ class UserDatabase:
                 backup_path = os.path.join(self.backup_dir, backup_filename)
                 shutil.copy2(self.filename, backup_path)
                 
-                # Keep only last 10 backups
-                self.cleanup_old_backups()
+                # Cleanup old backups in background (don't block)
+                threading.Thread(target=self.cleanup_old_backups, daemon=True).start()
         except Exception as e:
             logger.error(f"Error creating backup: {e}")
     
@@ -98,8 +140,14 @@ class UserDatabase:
             'premium_since': None
         })
     
-    def update_user(self, user_id: int, **kwargs):
-        """Update user data"""
+    def update_user(self, user_id: int, immediate: bool = False, **kwargs):
+        """Update user data
+        
+        Args:
+            user_id: User ID to update
+            immediate: If True, save immediately. Otherwise, use debounced save.
+            **kwargs: User data fields to update
+        """
         if user_id not in self.users:
             self.users[user_id] = self.get_user(user_id)
         
@@ -112,7 +160,7 @@ class UserDatabase:
                 kwargs['premium_since'] = datetime.now().isoformat()
         
         self.users[user_id].update(kwargs)
-        self.save_users()
+        self.save_users(immediate=immediate)
     
     def get_all_users(self) -> Dict[int, Dict[str, Any]]:
         """Get all users"""
@@ -150,7 +198,8 @@ class UserDatabase:
         self.update_user(user_id, 
                         suspended=True, 
                         suspension_reason=reason,
-                        status='suspended')
+                        status='suspended',
+                        immediate=True)
     
     def reactivate_user(self, user_id: int):
         """Reactivate a suspended user"""
@@ -163,7 +212,8 @@ class UserDatabase:
         self.update_user(user_id, 
                         suspended=False, 
                         suspension_reason=None,
-                        status=new_status)
+                        status=new_status,
+                        immediate=True)
     
     def approve_user(self, user_id: int):
         """Approve user for premium access"""
@@ -175,20 +225,23 @@ class UserDatabase:
             # Just mark as verified, don't change status yet
             self.update_user(user_id, 
                             verified=True,
-                            last_verification=datetime.now().isoformat())
+                            last_verification=datetime.now().isoformat(),
+                            immediate=True)
         else:
             # User is not on trial - approve normally
             self.update_user(user_id, 
                             verified=True, 
                             status='premium',
-                            last_verification=datetime.now().isoformat())
+                            last_verification=datetime.now().isoformat(),
+                            immediate=True)
     
     def reject_user(self, user_id: int):
         """Reject user verification request"""
         self.update_user(user_id, 
                         verified=False, 
                         status='free',
-                        verification_requests=self.get_user(user_id).get('verification_requests', 0) + 1)
+                        verification_requests=self.get_user(user_id).get('verification_requests', 0) + 1,
+                        immediate=True)
     
     def get_analytics(self) -> Dict[str, Any]:
         """Get comprehensive analytics"""
@@ -280,7 +333,7 @@ class UserDatabase:
                 try:
                     trial_end = datetime.fromisoformat(user_data['trial_end']).date()
                     if trial_end < today:
-                        self.update_user(user_id, status='free')
+                        self.update_user(user_id, status='free', immediate=True)
                         expired_count += 1
                 except Exception as e:
                     logger.error(f"Error processing trial expiry for user {user_id}: {e}")
@@ -289,6 +342,12 @@ class UserDatabase:
             logger.info(f"Cleaned up {expired_count} expired trials")
         
         return expired_count
+    
+    def shutdown(self):
+        """Shutdown database and save pending changes"""
+        self._shutdown = True
+        if self._save_pending:
+            self._perform_save()
     
     def get_user_stats(self, user_id: int) -> Dict[str, Any]:
         """Get detailed stats for a specific user"""

@@ -65,6 +65,7 @@ TRANSLATIONS = {
         'btn_english': '🇬🇧 English',
         'btn_malay': '🇲🇾 Malay',
         'btn_indonesian': '🇮🇩 Indonesian',
+        'btn_thai': '🇹🇭 Thai',
         'btn_back': '⬅️ Back to Main Menu',
         
         # Status
@@ -146,10 +147,12 @@ TRANSLATIONS = {
         'lang_english': '🇬🇧 English - English language',
         'lang_malay': '🇲🇾 Malay - Bahasa Melayu',
         'lang_indonesian': '🇮🇩 Indonesian - Bahasa Indonesia',
+        'lang_thai': '🇹🇭 Thai - ภาษาไทย',
         'lang_select': 'Select a language to continue:',
         'lang_changed_en': '✅ Language changed to English\n\nAll bot messages will now be displayed in English.',
         'lang_changed_my': '✅ Bahasa telah ditukar ke Bahasa Melayu\n\nSemua mesej bot kini akan dipaparkan dalam Bahasa Melayu.',
         'lang_changed_id': '✅ Bahasa telah diubah ke Bahasa Indonesia\n\nSemua pesan bot sekarang akan ditampilkan dalam Bahasa Indonesia.',
+        'lang_changed_th': '✅ ภาษาได้เปลี่ยนเป็นภาษาไทย\n\nข้อความทั้งหมดของบอทจะแสดงเป็นภาษาไทย',
     },
     'my': {
         # Buttons
@@ -165,6 +168,7 @@ TRANSLATIONS = {
         'btn_english': '🇬🇧 Bahasa Inggeris',
         'btn_malay': '🇲🇾 Bahasa Melayu',
         'btn_indonesian': '🇮🇩 Bahasa Indonesia',
+        'btn_thai': '🇹🇭 Bahasa Thai',
         'btn_back': '⬅️ Kembali ke Menu Utama',
         
         # Status
@@ -246,10 +250,12 @@ TRANSLATIONS = {
         'lang_english': '🇬🇧 Bahasa Inggeris - English language',
         'lang_malay': '🇲🇾 Bahasa Melayu - Bahasa Melayu',
         'lang_indonesian': '🇮🇩 Bahasa Indonesia - Bahasa Indonesia',
+        'lang_thai': '🇹🇭 Bahasa Thai - ภาษาไทย',
         'lang_select': 'Pilih bahasa untuk meneruskan:',
         'lang_changed_en': '✅ Language changed to English\n\nAll bot messages will now be displayed in English.',
         'lang_changed_my': '✅ Bahasa telah ditukar ke Bahasa Melayu\n\nSemua mesej bot kini akan dipaparkan dalam Bahasa Melayu.',
         'lang_changed_id': '✅ Bahasa telah diubah ke Bahasa Indonesia\n\nSemua pesan bot sekarang akan ditampilkan dalam Bahasa Indonesia.',
+        'lang_changed_th': '✅ ภาษาได้เปลี่ยนเป็นภาษาไทย\n\nข้อความทั้งหมดของบอทจะแสดงเป็นภาษาไทย',
     },
     'id': {
         # Buttons
@@ -265,6 +271,7 @@ TRANSLATIONS = {
         'btn_english': '🇬🇧 Bahasa Inggris',
         'btn_malay': '🇲🇾 Bahasa Melayu',
         'btn_indonesian': '🇮🇩 Bahasa Indonesia',
+        'btn_thai': '🇹🇭 Bahasa Thailand',
         'btn_back': '⬅️ Kembali ke Menu Utama',
         
         # Status
@@ -346,10 +353,115 @@ TRANSLATIONS = {
         'lang_english': '🇬🇧 Bahasa Inggris - English language',
         'lang_malay': '🇲🇾 Bahasa Melayu - Bahasa Melayu',
         'lang_indonesian': '🇮🇩 Bahasa Indonesia - Bahasa Indonesia',
+        'lang_thai': '🇹🇭 Bahasa Thailand - ภาษาไทย',
         'lang_select': 'Pilih bahasa untuk melanjutkan:',
         'lang_changed_en': '✅ Bahasa diubah ke Bahasa Inggris\n\nSemua pesan bot sekarang akan ditampilkan dalam Bahasa Inggris.',
         'lang_changed_my': '✅ Bahasa diubah ke Bahasa Melayu\n\nSemua pesan bot sekarang akan ditampilkan dalam Bahasa Melayu.',
         'lang_changed_id': '✅ Bahasa diubah ke Bahasa Indonesia\n\nSemua pesan bot sekarang akan ditampilkan dalam Bahasa Indonesia.',
+        'lang_changed_th': '✅ ภาษาได้เปลี่ยนเป็นภาษาไทย\n\nข้อความทั้งหมดของบอทจะแสดงเป็นภาษาไทย',
+    },
+    'th': {
+        # Buttons
+        'btn_free_analysis': '📊 การวิเคราะห์ตลาดฟรี',
+        'btn_premium_signals': '🔑 สัญญาณพรีเมียม',
+        'btn_register': '📝 ลงทะเบียนสำหรับพรีเมียม',
+        'btn_my_account': '👤 บัญชีของฉัน',
+        'btn_help': 'ℹ️ ความช่วยเหลือและสนับสนุน',
+        'btn_notice_board': '📌 กระดานประกาศ',
+        'btn_performance': '📈 บันทึกผลการดำเนินงาน',
+        'btn_terms': '📜 ข้อกำหนดและเงื่อนไข',
+        'btn_language': '🌐 ภาษา',
+        'btn_english': '🇬🇧 ภาษาอังกฤษ',
+        'btn_malay': '🇲🇾 ภาษามลายู',
+        'btn_indonesian': '🇮🇩 ภาษาอินโดนีเซีย',
+        'btn_thai': '🇹🇭 ภาษาไทย',
+        'btn_back': '⬅️ กลับไปยังเมนูหลัก',
+        
+        # Status
+        'status_trial': '🎁 การทดลองพรีเมียมที่ใช้งาน ({days} วันเหลือ)',
+        'status_premium': '💎 สมาชิกพรีเมียม',
+        'status_free': '🆓 ผู้ใช้ฟรี',
+        'status_suspended': '🚫 ถูกระงับ',
+        
+        # Menu
+        'menu_choose_option': 'เลือกตัวเลือก:',
+        'menu_welcome': '👋 ยินดีต้อนรับ',
+        
+        # Account
+        'account_title': '👤 บัญชีของฉัน',
+        'account_status': '📊 สถานะ:',
+        'account_country': '🌍 ประเทศ:',
+        'account_email': '📧 อีเมล:',
+        'account_number': '🔢 หมายเลขบัญชี:',
+        'account_verified': '✅ ตรวจสอบแล้ว',
+        'account_not_verified': '❌ ยังไม่ได้รับการตรวจสอบ',
+        'account_trial_days': '⏳ วันทดลองเหลือ:',
+        'account_premium_message': '\n\n✨ ขอบคุณที่เป็สมาชิกพรีเมียม!\nรักษาบัญชีโบรกเกอร์ของคุณให้ใช้งานได้เพื่อเพลิดเพลินกับการเข้าถึงแบบไม่ขาดตอน',
+        
+        # Help
+        'help_title': 'ℹ️ ความช่วยเหลือและสนับสนุน',
+        'help_features': 'ฟีเจอร์ที่มี:',
+        'help_free_analysis': '📊 การวิเคราะห์ฟรี – การสังเกตตลาดที่สร้างโดย AI รายวัน',
+        'help_premium_signals': '💎 สัญญาณพรีเมียม – เข้าถึงบันทึกการศึกษารายละเอียด (การทดลอง/พรีเมียมเท่านั้น)',
+        'help_register': '📝 ลงทะเบียน – อัปเกรดเป็นพรีเมียมโดยการลงทะเบียนด้วยลิงก์โบรกเกอร์ของเรา',
+        'help_account': '👤 บัญชี – ตรวจสอบสถานะของคุณ (การทดลอง / พรีเมียม / ถูกระงับ)',
+        'help_how_premium': 'พรีเมียมทำงานอย่างไร:',
+        'help_step1': '1️⃣ เริ่มต้นด้วยการทดลองฟรี 14 วัน',
+        'help_step2': '2️⃣ ลงทะเบียนด้วยลิงก์โบรกเกอร์ของเรา',
+        'help_step3': '3️⃣ ฝากเงินขั้นต่ำ $50 USD เข้าบัญชีโบรกเกอร์',
+        'help_step4': '4️⃣ ส่งอีเมลและชื่อของคุณเพื่อการตรวจสอบ',
+        'help_step5': '5️⃣ การอนุมัติจากผู้ดูแลระบบให้สิทธิ์การเข้าถึงพรีเมียม',
+        'help_disclaimer': '⚠️ ข้อจำกัดความรับผิดชอบที่สำคัญ:',
+        'help_disclaimer_text': 'การวิเคราะห์ทั้งหมดที่ให้มานั้นสร้างโดย AI และเพื่อวัตถุประสงค์ทางการศึกษาเท่านั้น\n\nบริการนี้ไม่ให้คำแนะนำทางการเงิน\n\nผู้ใช้ต้อง DYOR (ทำการวิจัยของคุณเอง) และ TAYOR (เทรดด้วยความเสี่ยงของคุณเอง)\n\nโดยการใช้บอทนี้ คุณยอมรับว่าคุณรับผิดชอบเต็มที่สำหรับการตัดสินใจเทรดของคุณ',
+        'help_contact': '📬 ติดต่อสนับสนุน: [Admin](https://t.me/GoldenAi_admin)',
+        
+        # Notice Board
+        'notice_title': '📌 กระดานประกาศ',
+        'notice_announcements': '📢 ประกาศสำคัญ:',
+        'notice_stay_updated': 'ติดตามข่าวสารและอัปเดตล่าสุดจากบอทเทรดของเรา',
+        'notice_check_regularly': '📅 ตรวจสอบกลับเป็นประจำสำหรับประกาศใหม่',
+        'notice_tips': '💡 คำแนะนำ:',
+        'notice_tip1': '• ติดตามสัญญาณทั้งหมดอย่างรับผิดชอบ',
+        'notice_tip2': '• จัดการความเสี่ยงของคุณอย่างเหมาะสม',
+        'notice_tip3': '• รักษาบัญชีโบรกเกอร์ของคุณให้ใช้งานได้',
+        
+        # Performance
+        'performance_title': '📈 บันทึกผลการดำเนินงาน',
+        'performance_stats': '📊 สถิติผลการดำเนินงานของสัญญาณ:',
+        'performance_coming_soon': 'เร็วๆ นี้! ติดตามผลการดำเนินงานการเทรดและผลลัพธ์ของสัญญาณของคุณที่นี่',
+        'performance_features': '💡 ฟีเจอร์:',
+        'performance_feature1': '• การติดตามอัตราการชนะ',
+        'performance_feature2': '• การวิเคราะห์ผลกำไร/ขาดทุน',
+        'performance_feature3': '• ประวัติสัญญาณ',
+        'performance_soon': '🔒 ฟีเจอร์นี้จะพร้อมใช้งานเร็วๆ นี้!',
+        
+        # Terms
+        'terms_title': '📜 ข้อกำหนดและเงื่อนไข',
+        'terms_important': '📋 ข้อมูลสำคัญ:',
+        'terms_1_title': '1. เพื่อวัตถุประสงค์ทางการศึกษาเท่านั้น',
+        'terms_1_text': 'สัญญาณและการวิเคราะห์ทั้งหมดมีไว้เพื่อวัตถุประสงค์ทางการศึกษาเท่านั้น',
+        'terms_2_title': '2. ข้อจำกัดความรับผิดชอบความเสี่ยง',
+        'terms_2_text': 'การเทรดมีความเสี่ยง ควรทำการวิจัยของคุณเอง (DYOR) และรับผิดชอบเอง (TAYOR) เสมอ',
+        'terms_3_title': '3. ไม่มีคำแนะนำทางการเงิน',
+        'terms_3_text': 'เราไม่ให้คำแนะนำทางการเงิน การตัดสินใจเทรดทั้งหมดเป็นของคุณเอง',
+        'terms_4_title': '4. การลงทะเบียนโบรกเกอร์',
+        'terms_4_text': 'การเข้าถึงพรีเมียมต้องมีการลงทะเบียนบัญชีโบรกเกอร์ที่ถูกต้อง',
+        'terms_5_title': '5. ความรับผิดชอบบัญชี',
+        'terms_5_text': 'รักษาบัญชีโบรกเกอร์ของคุณให้มีการระดมทุนและใช้งานได้เพื่อรักษาสถานะพรีเมียม',
+        'terms_agree': '⚠️ โดยการใช้บอทนี้ คุณยอมรับข้อกำหนดเหล่านี้',
+        
+        # Language
+        'lang_title': '🌐 การเลือกภาษา',
+        'lang_choose': 'เลือกภาษาที่คุณต้องการ:',
+        'lang_english': '🇬🇧 ภาษาอังกฤษ - English language',
+        'lang_malay': '🇲🇾 ภาษามลายู - Bahasa Melayu',
+        'lang_indonesian': '🇮🇩 ภาษาอินโดนีเซีย - Bahasa Indonesia',
+        'lang_thai': '🇹🇭 ภาษาไทย - ภาษาไทย',
+        'lang_select': 'เลือกภาษาเพื่อดำเนินการต่อ:',
+        'lang_changed_en': '✅ ภาษาได้เปลี่ยนเป็นภาษาอังกฤษ\n\nข้อความทั้งหมดของบอทจะแสดงเป็นภาษาอังกฤษ',
+        'lang_changed_my': '✅ ภาษาได้เปลี่ยนเป็นภาษามลายู\n\nข้อความทั้งหมดของบอทจะแสดงเป็นภาษามลายู',
+        'lang_changed_id': '✅ ภาษาได้เปลี่ยนเป็นภาษาอินโดนีเซีย\n\nข้อความทั้งหมดของบอทจะแสดงเป็นภาษาอินโดนีเซีย',
+        'lang_changed_th': '✅ ภาษาได้เปลี่ยนเป็นภาษาไทย\n\nข้อความทั้งหมดของบอทจะแสดงเป็นภาษาไทย',
     }
 }
 
@@ -362,7 +474,7 @@ def get_user_language(user_id: int) -> str:
         lang = db.users[user_id].get('language', 'en')
     else:
         lang = user_data.get('language', 'en')
-    return lang if lang in ['en', 'my', 'id'] else 'en'  # Default to English
+    return lang if lang in ['en', 'my', 'id', 'th'] else 'en'  # Default to English
 
 def t(user_id: int, key: str, **kwargs) -> str:
     """Translate text based on user's language"""
@@ -484,7 +596,7 @@ def get_latest_signal():
         
         return latest_signal
     except Exception as e:
-        print(f"Error getting latest signal: {e}")
+        logger.error(f"Error getting latest signal: {e}")
         return None
 
 def store_latest_signal(signal_id, symbol, action, entry_price, stop_loss, take_profit, description):
@@ -504,9 +616,9 @@ def store_latest_signal(signal_id, symbol, action, entry_price, stop_loss, take_
         with open('latest_signal.json', 'w') as f:
             json.dump(latest_signal, f, indent=2)
         
-        print(f"✅ Latest signal stored: {signal_id}")
+        logger.debug(f"✅ Latest signal stored: {signal_id}")
     except Exception as e:
-        print(f"Error storing latest signal: {e}")
+        logger.error(f"Error storing latest signal: {e}")
 
 def get_market_data(symbol, period="5d"):
     """Fetch market data using yfinance with better error handling"""
@@ -583,7 +695,7 @@ def calculate_technical_indicators(data):
             'price_change': round(((current_price - data['Close'].iloc[-2]) / data['Close'].iloc[-2]) * 100, 2) if len(data) > 1 else 0
         }
     except Exception as e:
-        print(f"Error calculating indicators: {e}")
+        logger.error(f"Error calculating indicators: {e}")
         return {}
 
 def generate_market_analysis():
@@ -813,15 +925,8 @@ async def start_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> i
     full_name = f"{first_name} {last_name}".strip()
     user_data = db.get_user(user_id)
     
-    # Print user info to terminal
-    print(f"🚀 USER STARTED BOT:")
-    print(f"   👤 Name: {full_name}")
-    print(f"   🏷️ Username: @{username}")
-    print(f"   🆔 ID: {user_id}")
-    print(f"   📅 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"   🌍 Language: {update.effective_user.language_code or 'Unknown'}")
-    print(f"   📊 Status: {user_data.get('status', 'Unknown')}")
-    print("=" * 50)
+    # Log user info
+    logger.info(f"🚀 USER STARTED BOT: 👤 {full_name} (@{username}) | ID: {user_id} | Status: {user_data.get('status', 'Unknown')}")
     
     if not user_data['terms_accepted']:
         await update.message.reply_text(
@@ -866,7 +971,7 @@ async def handle_terms(update: Update, context: ContextTypes.DEFAULT_TYPE) -> in
     user_id = update.effective_user.id
     
     if query.data == "accept_terms":
-        db.update_user(user_id, terms_accepted=True)
+        db.update_user(user_id, terms_accepted=True, immediate=True)
         
         await query.edit_message_text(
             f"✅ Thank you for accepting the Terms & Conditions, {update.effective_user.first_name}!\n\n"
@@ -899,7 +1004,7 @@ async def handle_trial_choice(update: Update, context: ContextTypes.DEFAULT_TYPE
     
     if query.data == "start_trial":
         trial_end = datetime.now() + timedelta(days=14)
-        db.update_user(user_id, status='trial', trial_end=trial_end.isoformat())
+        db.update_user(user_id, status='trial', trial_end=trial_end.isoformat(), immediate=True)
         
         user_id = update.effective_user.id
         await query.edit_message_text(
@@ -1159,6 +1264,7 @@ async def handle_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYP
                 [InlineKeyboardButton(translations['btn_english'], callback_data="lang_en")],
                 [InlineKeyboardButton(translations['btn_malay'], callback_data="lang_my")],
                 [InlineKeyboardButton(translations['btn_indonesian'], callback_data="lang_id")],
+                [InlineKeyboardButton(translations['btn_thai'], callback_data="lang_th")],
                 [InlineKeyboardButton(translations['btn_back'], callback_data="main_menu")]
             ])
             
@@ -1166,7 +1272,8 @@ async def handle_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYP
             lang_text += t(user_id, 'lang_choose') + "\n\n"
             lang_text += "**" + translations['btn_english'] + "** - English language\n"
             lang_text += "**" + translations['btn_malay'] + "** - Bahasa Melayu\n"
-            lang_text += "**" + translations['btn_indonesian'] + "** - Bahasa Indonesia\n\n"
+            lang_text += "**" + translations['btn_indonesian'] + "** - Bahasa Indonesia\n"
+            lang_text += "**" + translations['btn_thai'] + "** - ภาษาไทย\n\n"
             lang_text += t(user_id, 'lang_select')
             
             await query.edit_message_text(
@@ -1285,12 +1392,28 @@ async def handle_menu_callback(update: Update, context: ContextTypes.DEFAULT_TYP
                 reply_markup=create_main_menu(user_id)
             )
         
+        elif query.data == "lang_th":
+            # Save language preference
+            db.update_user(user_id, language='th')
+            # Ensure user exists in database
+            if user_id not in db.users:
+                db.users[user_id] = db.get_user(user_id)
+            db.users[user_id]['language'] = 'th'
+            
+            await query.answer("✅ ภาษาได้ตั้งเป็นภาษาไทย", show_alert=False)
+            # Get updated translation directly from Thai translations
+            message = "**🌐 การเลือกภาษา**\n\n" + TRANSLATIONS['th']['lang_changed_th']
+            await query.edit_message_text(
+                message,
+                parse_mode=ParseMode.MARKDOWN,
+                reply_markup=create_main_menu(user_id)
+            )
+        
         elif query.data == "main_menu":
             await show_main_menu(update, context)
         
         else:
-            print(f"🔧 DEBUG: Unknown callback data: {query.data}")
-            logger.warning(f"Unknown callback data: {query.data} from user {user_id}")
+            logger.debug(f"Unknown callback data: {query.data} from user {user_id}")
             await query.edit_message_text(
                 f"❌ Unknown Command\n\n"
                 f"Callback data: {query.data}\n\n"
@@ -1321,13 +1444,7 @@ async def handle_register_name(update: Update, context: ContextTypes.DEFAULT_TYP
         
         # Print registration progress to terminal
         username = update.effective_user.username or "Unknown"
-        print(f"📝 USER REGISTRATION PROGRESS:")
-        print(f"   👤 Name: {full_name}")
-        print(f"   🏷️ Username: @{username}")
-        print(f"   🆔 ID: {user_id}")
-        print(f"   📅 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"   📊 Step: Name Entered")
-        print("=" * 50)
+        logger.info(f"📝 USER REGISTRATION: 👤 {full_name} (@{username}) | ID: {user_id} | Step: Name Entered")
         
         await update.message.reply_text(
             f"✅ Name saved: {full_name}\n\n"
@@ -1390,15 +1507,7 @@ async def handle_account_number(update: Update, context: ContextTypes.DEFAULT_TY
         # Print registration completion to terminal
         username = update.effective_user.username or "Unknown"
         user_data = db.get_user(user_id)
-        print(f"✅ USER REGISTRATION COMPLETED:")
-        print(f"   👤 Name: {user_data['full_name']}")
-        print(f"   🏷️ Username: @{username}")
-        print(f"   🆔 ID: {user_id}")
-        print(f"   📧 Email: {user_data['email']}")
-        print(f"   🔢 Account: {account_number}")
-        print(f"   📅 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"   📊 Status: Pending Admin Approval")
-        print("=" * 50)
+        logger.info(f"✅ REGISTRATION COMPLETED: 👤 {user_data['full_name']} (@{username}) | ID: {user_id} | Email: {user_data['email']} | Account: {account_number}")
         
         await update.message.reply_text(
             f"✅ Registration Complete!\n\n"
@@ -1669,17 +1778,15 @@ async def handle_admin_callback_old(update: Update, context: ContextTypes.DEFAUL
     query = update.callback_query
     await query.answer()
     
-    print(f"🔧 DEBUG: Admin callback received: {query.data}")
-    print(f"🔧 DEBUG: User ID: {update.effective_user.id}")
-    print(f"🔧 DEBUG: Is Admin: {is_admin(update.effective_user.id)}")
+    logger.debug(f"Admin callback: {query.data} | User ID: {update.effective_user.id} | Is Admin: {is_admin(update.effective_user.id)}")
     
     if not is_admin(update.effective_user.id):
-        print("🔧 DEBUG: Access denied - not admin")
+        logger.warning("Access denied - not admin")
         await query.edit_message_text("❌ Access denied.")
         return
     
     if query.data == "admin_users":
-        print("🔧 DEBUG: Processing admin_users callback")
+        logger.debug("Processing admin_users callback")
         try:
             users = db.get_all_users()
             total = len(users)
@@ -2092,15 +2199,7 @@ async def approve_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         # Print admin action to terminal
         user_data = db.get_user(user_id)
-        print(f"✅ ADMIN APPROVED USER:")
-        print(f"   👤 Name: {user_data.get('full_name', 'Unknown')}")
-        print(f"   🏷️ Username: @{user_data.get('username', 'Unknown')}")
-        print(f"   🆔 ID: {user_id}")
-        print(f"   📧 Email: {user_data.get('email', 'Unknown')}")
-        print(f"   🔢 Account: {user_data.get('account_number', 'Unknown')}")
-        print(f"   📅 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"   📊 Status: Premium Active")
-        print("=" * 50)
+        logger.info(f"✅ ADMIN APPROVED: 👤 {user_data.get('full_name', 'Unknown')} | ID: {user_id} | Email: {user_data.get('email', 'Unknown')} | Account: {user_data.get('account_number', 'Unknown')}")
         
         if success:
             await update.message.reply_text(
@@ -2154,16 +2253,7 @@ async def reject_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         
         # Print admin action to terminal
         user_data = db.get_user(user_id)
-        print(f"❌ ADMIN REJECTED USER:")
-        print(f"   👤 Name: {user_data.get('full_name', 'Unknown')}")
-        print(f"   🏷️ Username: @{user_data.get('username', 'Unknown')}")
-        print(f"   🆔 ID: {user_id}")
-        print(f"   📧 Email: {user_data.get('email', 'Unknown')}")
-        print(f"   🔢 Account: {user_data.get('account_number', 'Unknown')}")
-        print(f"   📅 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"   📊 Status: Rejected")
-        print(f"   📝 Reason: {reason}")
-        print("=" * 50)
+        logger.info(f"❌ ADMIN REJECTED: 👤 {user_data.get('full_name', 'Unknown')} | ID: {user_id} | Reason: {reason}")
         
         await update.message.reply_text(
             f"❌ User Rejected\n\n"
@@ -2400,19 +2490,7 @@ async def signal_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
         results = await signal_manager.send_signal_to_users(context, signal_id, "premium")
         
         # Print signal creation to terminal
-        print(f"🚀 SIGNAL CREATED & SENT:")
-        print(f"   🆔 ID: {signal_id}")
-        print(f"   📊 Symbol: {symbol}")
-        print(f"   💰 Action: {action}")
-        print(f"   📈 Entry: {entry_price}")
-        print(f"   🛑 Stop Loss: {stop_loss}")
-        print(f"   🎯 Take Profit: {take_profit}")
-        print(f"   📊 Risk/Reward: 1:{risk_reward_ratio:.1f}")
-        print(f"   📝 Description: {description or 'None'}")
-        print(f"   📅 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"   📤 Sent to: {results['sent']} premium users")
-        print(f"   ❌ Failed: {results['failed']}")
-        print("=" * 50)
+        logger.info(f"🚀 SIGNAL CREATED: ID={signal_id} | {symbol} {action} | Entry={entry_price} | SL={stop_loss} | TP={take_profit} | Sent={results['sent']} | Failed={results['failed']}")
         
         await update.message.reply_text(
             f"✅ Signal Created & Sent!\n\n"
@@ -2862,22 +2940,11 @@ async def ai_signal_command(update: Update, context: ContextTypes.DEFAULT_TYPE):
                     )
                     sent_count += 1
                 except Exception as e:
-                    print(f"Failed to send AI signal to user {user_id}: {e}")
+                    logger.error(f"Failed to send AI signal to user {user_id}: {e}")
                     failed_count += 1
         
         # Print signal creation to terminal
-        print(f"🤖 AI SIGNAL CREATED & SENT:")
-        print(f"   📊 Symbol: {symbol}")
-        print(f"   💰 Action: {action.upper()}")
-        print(f"   📈 Entry Range: {entry_range}")
-        print(f"   🎯 TP1: {tp1}")
-        print(f"   🎯 TP2: {tp2}")
-        print(f"   🛑 SL: {sl}")
-        print(f"   📝 Description: {description or 'None'}")
-        print(f"   📅 Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print(f"   📤 Sent to: {sent_count} users (Premium + Trial)")
-        print(f"   ❌ Failed: {failed_count}")
-        print("=" * 50)
+        logger.info(f"🤖 AI SIGNAL: {symbol} {action.upper()} | Entry={entry_range} | TP1={tp1} TP2={tp2} SL={sl} | Sent={sent_count} | Failed={failed_count}")
         
         await update.message.reply_text(
             f"✅ AI Signal Created & Sent!\n\n"
@@ -3568,34 +3635,16 @@ def main():
     )
     
     # Start bot
-    print("🤖 Bot is starting...")
-    print(f"👤 Admin ID: {ADMIN_ID}")
-    print(f"🔗 Broker Link: {BROKER_LINK}")
-    print("=" * 60)
-    print("🚀 GOLDEN SIGNALS TRADING BOT STARTING...")
-    print("=" * 60)
-    print(f"📅 Start Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-    print(f"🤖 Bot Token: {BOT_TOKEN[:10]}...")
-    print(f"👑 Admin ID: {ADMIN_ID}")
-    print(f"💾 Database: users.json")
-    print(f"📊 Signals: signals.json")
-    print("=" * 60)
-    print("✅ Bot is now running and ready to receive messages!")
-    print("📱 Users can start the bot with /start command")
-    print("🔧 Admin can use /admin command for management")
-    print("=" * 60)
+    logger.info("🚀 GOLDEN SIGNALS TRADING BOT STARTING...")
+    logger.info(f"👑 Admin ID: {ADMIN_ID} | 💾 Database: users.json | 📊 Signals: signals.json")
+    logger.info("✅ Bot is now running and ready to receive messages!")
     
     try:
         application.run_polling()
     except KeyboardInterrupt:
-        print("\n" + "=" * 60)
-        print("🛑 BOT STOPPED BY USER")
-        print(f"📅 Stop Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print("=" * 60)
+        logger.info("🛑 BOT STOPPED BY USER")
     except Exception as e:
-        print(f"\n❌ BOT ERROR: {e}")
-        print(f"📅 Error Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print("=" * 60)
+        logger.error(f"❌ BOT ERROR: {e}")
 
 if __name__ == '__main__':
     # Railway compatibility
@@ -3605,11 +3654,6 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        print("\n" + "=" * 60)
-        print("🛑 BOT STOPPED BY USER")
-        print(f"📅 Stop Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print("=" * 60)
+        logger.info("🛑 BOT STOPPED BY USER")
     except Exception as e:
-        print(f"\n❌ BOT ERROR: {e}")
-        print(f"📅 Error Time: {datetime.now().strftime('%Y-%m-%d %H:%M:%S')}")
-        print("=" * 60)
+        logger.error(f"❌ BOT ERROR: {e}")

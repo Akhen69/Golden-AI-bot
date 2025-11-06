@@ -516,11 +516,12 @@
     "suspended": false,
     "suspension_reason": null,
     "created_at": "2025-11-05T15:43:03.265151",
-    "last_activity": "2025-11-05T15:47:48.500825",
+    "last_activity": "2025-11-06T10:29:34.138639",
     "last_verification": null,
     "verification_requests": 0,
     "total_signals_received": 0,
-    "premium_since": null
+    "premium_since": null,
+    "language": "en"
   },
   "7127576855": {
     "user_id": 7127576855,
